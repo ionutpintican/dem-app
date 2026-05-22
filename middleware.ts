@@ -45,7 +45,7 @@ export async function middleware(request: NextRequest) {
   // Protecție rută /admin – doar utilizatori cu rol admin
   if (pathname.startsWith("/admin") && user) {
     const { data: profile } = await supabase
-      .from("profiles")
+      .from("users")
       .select("role")
       .eq("id", user.id)
       .single();

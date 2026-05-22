@@ -9,11 +9,12 @@ export default async function AdminPage() {
 
   if (!user) redirect("/autentificare");
 
+  const userId = user!.id;
   const { data: profile } = await supabase
-    .from("profiles")
+    .from("users")
     .select("role")
-    .eq("id", user.id)
-    .single();
+    .eq("id", userId)
+    .single() as unknown as { data: { role: string } | null; error: unknown };
 
   if (profile?.role !== "admin") redirect("/dashboard");
 
