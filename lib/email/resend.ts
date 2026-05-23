@@ -2,6 +2,11 @@ import { Resend } from "resend";
 
 export const resend = new Resend(process.env.RESEND_API_KEY);
 
+// În development folosim onboarding@resend.dev (nu necesită domeniu verificat).
+// În producție setează RESEND_FROM_EMAIL=noreply@domeniu-tau.ro în Vercel env vars.
+const FROM_EMAIL =
+  process.env.RESEND_FROM_EMAIL ?? "DEM <onboarding@resend.dev>";
+
 export async function sendEmail({
   to,
   subject,
@@ -12,7 +17,7 @@ export async function sendEmail({
   html: string;
 }) {
   const { data, error } = await resend.emails.send({
-    from: `dem-app <noreply@${process.env.NEXT_PUBLIC_APP_URL?.replace(/https?:\/\//, "")}>`,
+    from: FROM_EMAIL,
     to,
     subject,
     html,

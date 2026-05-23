@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { z } from "zod";
 
 const patientSchema = z.object({
@@ -31,6 +32,7 @@ function formatBytes(bytes: number) {
 }
 
 export default function PatientForm() {
+  const router = useRouter();
   const [fields, setFields] = useState({
     nume: "",
     prenume: "",
@@ -108,7 +110,8 @@ export default function PatientForm() {
 
       const res = await fetch("/api/cazuri/nou", { method: "POST", body: formData });
       if (!res.ok) throw new Error();
-      setStatus("success");
+      const data = await res.json();
+      router.push(`/confirmare${data.cazId ? `?id=${data.cazId}` : ""}`);
     } catch {
       setStatus("error");
     }
