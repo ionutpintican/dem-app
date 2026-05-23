@@ -28,7 +28,7 @@ export async function PATCH(
 
   const { id } = params;
   const body = await request.json();
-  const service = await createServiceClient();
+  const service = createServiceClient();
 
   // Regulă de business: nu poți dezactiva singurul Coordonator activ
   if (body.is_active === false) {

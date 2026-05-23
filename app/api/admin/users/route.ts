@@ -24,7 +24,7 @@ export async function GET() {
     return NextResponse.json({ error: "Acces interzis" }, { status: 403 });
   }
 
-  const service = await createServiceClient();
+  const service = createServiceClient();
   const { data: utilizatori, error } = await service
     .from("users")
     .select("id, full_name, email, role, is_coordinator, is_active, created_at")
@@ -54,7 +54,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Toate câmpurile sunt obligatorii" }, { status: 422 });
   }
 
-  const service = await createServiceClient();
+  const service = createServiceClient();
 
   // Creare cont în Supabase Auth
   const { data: authData, error: authError } = await service.auth.admin.createUser({

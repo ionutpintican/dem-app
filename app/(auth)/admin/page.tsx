@@ -21,7 +21,7 @@ export default async function AdminPage() {
 
   // Preia lista utilizatorilor (cu service role pentru a vedea toți)
   const { createServiceClient } = await import("@/lib/supabase/server");
-  const service = await createServiceClient();
+  const service = createServiceClient();
   const { data: utilizatori } = await service
     .from("users")
     .select("id, full_name, email, role, is_coordinator, is_active, created_at")

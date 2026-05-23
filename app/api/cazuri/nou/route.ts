@@ -46,7 +46,7 @@ export async function POST(request: Request) {
   const numePacient = `${prenume} ${nume}`;
   const fisiere = formData.getAll("fisiere") as File[];
 
-  const service = await createServiceClient();
+  const service = createServiceClient();
 
   // ─── 2. Inserare caz în DB ──────────────────────────────────────────────────
   const { data: caz, error: cazError } = await service
