@@ -130,8 +130,8 @@ export async function POST(request: Request) {
       .from("audit_logs")
       .insert({
         action: "create",
-        table_name: "cases",
-        record_id: cazId,
+        resource_type: "cases",
+        resource_id: cazId,
         case_id: cazId,
         notes: `Caz nou trimis de pacient: ${numePacient}`,
       } as never);

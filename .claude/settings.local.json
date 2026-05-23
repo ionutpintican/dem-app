@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pandoc \"C:\\\\Users\\\\Roxana Pintican\\\\Downloads\\\\DEM_Plan_Dezvoltare_v2.docx\" -t markdown)",
+      "Bash(pandoc \"C:\\\\Users\\\\Roxana Pintican\\\\Downloads\\\\DEM_Specificatii_v5.docx\" -t markdown)",
+      "Bash(npx tsc *)",
+      "Bash(npx next *)",
+      "Bash(mkdir -p \"C:/Users/Roxana Pintican/dem-app/app/api/admin/users\" && mkdir -p \"C:/Users/Roxana Pintican/dem-app/app/api/admin/users/[id]\")",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "WebFetch(domain:claude.ai)",
+      "mcp__Claude_in_Chrome__tabs_context_mcp"
+    ]
+  }
+}

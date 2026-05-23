@@ -46,6 +46,7 @@ export default function PatientForm() {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [fileError, setFileError] = useState<string>("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [eroareServer, setEroareServer] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
@@ -103,14 +104,19 @@ export default function PatientForm() {
     }
 
     setStatus("loading");
+    setEroareServer("");
     try {
       const formData = new FormData();
       Object.entries(fields).forEach(([k, v]) => formData.append(k, String(v)));
       files.forEach((f) => formData.append("fisiere", f));
 
       const res = await fetch("/api/cazuri/nou", { method: "POST", body: formData });
-      if (!res.ok) throw new Error();
       const data = await res.json();
+      if (!res.ok) {
+        setEroareServer(data.error ?? "Eroare necunoscută.");
+        setStatus("error");
+        return;
+      }
       router.push(`/confirmare${data.cazId ? `?id=${data.cazId}` : ""}`);
     } catch {
       setStatus("error");
@@ -364,7 +370,7 @@ export default function PatientForm() {
       {/* Eroare server */}
       {status === "error" && (
         <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
-          A apărut o eroare la trimiterea cererii. Te rugăm să încerci din nou sau să ne contactezi direct.
+          {eroareServer || "A apărut o eroare la trimiterea cererii. Te rugăm să încerci din nou."}
         </div>
       )}
 
