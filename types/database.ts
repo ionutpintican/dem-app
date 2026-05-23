@@ -1,4 +1,17 @@
-export type UserRole = "user" | "specialist" | "coordinator" | "admin";
+export type UserRole =
+  | "radiolog"
+  | "oncolog"
+  | "chirurg_oncolog"
+  | "chirurg_plastician"
+  | "radioterapeut"
+  | "genetician"
+  | "psiholog"
+  | "nutritionist"
+  | "admin"
+  // valori moștenite (pot exista în DB)
+  | "user"
+  | "specialist"
+  | "coordinator";
 export type CaseStatus =
   | "draft"
   | "open"

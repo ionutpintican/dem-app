@@ -89,7 +89,7 @@ export async function POST(request: Request) {
   if (profileError) {
     // Rollback: șterge userul din Auth dacă profilul nu s-a creat
     await service.auth.admin.deleteUser(authData.user.id);
-    return NextResponse.json({ error: "Eroare la crearea profilului" }, { status: 500 });
+    return NextResponse.json({ error: "Eroare la crearea profilului. Încearcă din nou." }, { status: 500 });
   }
 
   return NextResponse.json({ success: true, userId: authData.user.id }, { status: 201 });
