@@ -151,7 +151,7 @@ export default function CoordinatorPanel({
           <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{eroareRedeschidere}</p>
         )}
 
-        {stareRedeschidere === "confirmare" || stareRedeschidere === "loading" ? (
+        {stareRedeschidere === "confirmare" ? (
           <div className="bg-white rounded-lg border border-amber-200 p-4 space-y-3">
             <p className="text-sm text-slate-700">
               Redeschiderea fișei permite medicilor să editeze evaluările și coordonatorului să
@@ -160,8 +160,7 @@ export default function CoordinatorPanel({
             <div className="flex gap-2">
               <button
                 onClick={redeschideFisa}
-                disabled={stareRedeschidere === "loading"}
-                className="flex-1 px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700 transition-colors disabled:opacity-60"
+                className="flex-1 px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700 transition-colors"
               >
                 Da, redeschide fișa
               </button>
@@ -172,6 +171,14 @@ export default function CoordinatorPanel({
                 Anulează
               </button>
             </div>
+          </div>
+        ) : stareRedeschidere === "loading" ? (
+          <div className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-amber-200 text-amber-600 text-sm">
+            <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            Se redeschide...
           </div>
         ) : (
           <button
