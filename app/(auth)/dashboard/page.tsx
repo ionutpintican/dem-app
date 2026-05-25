@@ -87,13 +87,13 @@ export default async function DashboardPage() {
             {esteAdmin && (
               <nav className="hidden sm:flex items-center gap-1 ml-2">
                 <span className="text-sm font-semibold text-slate-900 px-3 py-1.5 bg-slate-100 rounded-lg">
-                  Dashboard
+                  Dashboard Admin
                 </span>
                 <Link
                   href="/admin"
                   className="text-sm text-slate-500 hover:text-slate-900 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors"
                 >
-                  Admin
+                  Users Admin
                 </Link>
               </nav>
             )}
@@ -162,7 +162,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Lista cazuri */}
-        <CasesList cazuri={cazuri} />
+        <CasesList cazuri={cazuri} esteAdmin={esteAdmin} />
       </main>
     </div>
   );

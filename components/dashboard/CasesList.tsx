@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { STATUS_CONFIG, TOTAL_OBLIGATORII } from "@/lib/constante";
 
 const LUNI = ["ian.", "feb.", "mar.", "apr.", "mai", "iun.", "iul.", "aug.", "sep.", "oct.", "nov.", "dec."];
@@ -20,7 +21,7 @@ export type CazPreview = {
   patient_email: string;
   status: string;
   created_at: string;
-  completati: number; // câți din 6 obligatorii au completat
+  completati: number;
 };
 
 function BadgeStatus({ status }: { status: string }) {
@@ -52,9 +53,85 @@ function BaraProgres({ completati }: { completati: number }) {
   );
 }
 
-export default function CasesList({ cazuri }: { cazuri: CazPreview[] }) {
+function ModalConfirmareSterge({
+  caz,
+  onConfirm,
+  onAnuleaza,
+  loading,
+}: {
+  caz: CazPreview;
+  onConfirm: () => void;
+  onAnuleaza: () => void;
+  loading: boolean;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+            <svg className="w-5 h-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </div>
+          <div>
+            <h3 className="text-base font-semibold text-slate-900">Ștergere caz</h3>
+            <p className="text-sm text-slate-500">Această acțiune nu poate fi anulată.</p>
+          </div>
+        </div>
+
+        <div className="bg-slate-50 rounded-lg px-4 py-3 mb-5 border border-slate-200">
+          <p className="text-sm font-medium text-slate-900">{caz.patient_name}</p>
+          <p className="text-xs text-slate-500 mt-0.5">{caz.patient_email}</p>
+        </div>
+
+        <p className="text-sm text-slate-600 mb-6">
+          Ești sigur că vrei să ștergi definitiv acest caz? Toate datele asociate (inputuri specialiști, fișiere, concluzii) vor fi eliminate permanent.
+        </p>
+
+        <div className="flex gap-3">
+          <button
+            onClick={onAnuleaza}
+            disabled={loading}
+            className="flex-1 px-4 py-2.5 rounded-lg border border-slate-300 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors disabled:opacity-50"
+          >
+            Anulează
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={loading}
+            className="flex-1 px-4 py-2.5 rounded-lg bg-red-600 text-sm font-medium text-white hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+          >
+            {loading ? (
+              <>
+                <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                </svg>
+                Se șterge...
+              </>
+            ) : (
+              "Șterge definitiv"
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function CasesList({
+  cazuri,
+  esteAdmin = false,
+}: {
+  cazuri: CazPreview[];
+  esteAdmin?: boolean;
+}) {
+  const router = useRouter();
   const [cautare, setCautare] = useState("");
   const [filtruStatus, setFiltruStatus] = useState("");
+  const [cazDeSters, setCazDeSters] = useState<CazPreview | null>(null);
+  const [loadingSterge, setLoadingSterge] = useState(false);
 
   const cazuriFiltrate = cazuri.filter((c) => {
     const potrivitCautare =
@@ -65,8 +142,31 @@ export default function CasesList({ cazuri }: { cazuri: CazPreview[] }) {
     return potrivitCautare && potrivitStatus;
   });
 
+  async function handleSterge() {
+    if (!cazDeSters) return;
+    setLoadingSterge(true);
+    try {
+      const res = await fetch(`/api/cazuri/${cazDeSters.id}`, { method: "DELETE" });
+      if (res.ok) {
+        setCazDeSters(null);
+        router.refresh();
+      }
+    } finally {
+      setLoadingSterge(false);
+    }
+  }
+
   return (
     <div>
+      {cazDeSters && (
+        <ModalConfirmareSterge
+          caz={cazDeSters}
+          onConfirm={handleSterge}
+          onAnuleaza={() => setCazDeSters(null)}
+          loading={loadingSterge}
+        />
+      )}
+
       {/* Filtre */}
       <div className="flex flex-col sm:flex-row gap-3 mb-4">
         <div className="relative flex-1">
@@ -140,12 +240,26 @@ export default function CasesList({ cazuri }: { cazuri: CazPreview[] }) {
                       <BaraProgres completati={caz.completati} />
                     </td>
                     <td className="px-4 py-4 text-right">
-                      <Link
-                        href={`/caz/${caz.id}`}
-                        className="text-xs font-medium text-blue-600 hover:text-blue-700 px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-colors"
-                      >
-                        Deschide →
-                      </Link>
+                      <div className="flex items-center justify-end gap-2">
+                        <Link
+                          href={`/caz/${caz.id}`}
+                          className="text-xs font-medium text-blue-600 hover:text-blue-700 px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-colors"
+                        >
+                          Deschide →
+                        </Link>
+                        {esteAdmin && (
+                          <button
+                            onClick={() => setCazDeSters(caz)}
+                            className="text-xs font-medium text-red-500 hover:text-red-700 px-2 py-1.5 rounded-lg hover:bg-red-50 transition-colors"
+                            title="Șterge caz"
+                          >
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
