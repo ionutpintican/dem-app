@@ -151,7 +151,7 @@ export default function CoordinatorPanel({
           <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{eroareRedeschidere}</p>
         )}
 
-        {stareRedeschidere === "confirmare" ? (
+        {stareRedeschidere === "confirmare" || stareRedeschidere === "loading" ? (
           <div className="bg-white rounded-lg border border-amber-200 p-4 space-y-3">
             <p className="text-sm text-slate-700">
               Redeschiderea fișei permite medicilor să editeze evaluările și coordonatorului să
