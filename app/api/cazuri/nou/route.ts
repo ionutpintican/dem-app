@@ -73,10 +73,15 @@ export async function POST(request: Request) {
   const cazId = caz.id;
 
   // ─── 3. Upload fișiere în Supabase Storage ──────────────────────────────────
-  const fisiereIncarcate: { name: string; path: string; size: number }[] = [];
+  const CATEGORII_VALIDE = ["ct", "rmn", "ecografie", "radiografie", "biopsie", "analize", "scrisoare", "altele"];
+  const fisiereIncarcate: { name: string; path: string; size: number; category: string }[] = [];
 
-  for (const fisier of fisiere) {
+  for (let i = 0; i < fisiere.length; i++) {
+    const fisier = fisiere[i];
     if (fisier.size === 0) continue;
+
+    const categorieRaw = (formData.get(`categorie_${i}`) as string) ?? "altele";
+    const categorie = CATEGORII_VALIDE.includes(categorieRaw) ? categorieRaw : "altele";
 
     const extensie = fisier.name.split(".").pop() ?? "";
     const numeFisier = `${Date.now()}_${fisier.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
@@ -101,6 +106,7 @@ export async function POST(request: Request) {
       name: fisier.name,
       path: caleStorage,
       size: fisier.size,
+      category: categorie,
     });
   }
 
@@ -111,7 +117,7 @@ export async function POST(request: Request) {
       file_name: f.name,
       file_path: f.path,
       file_size: f.size,
-      category: "altele",
+      category: f.category,
     }));
 
     const { error: fisierError } = await service

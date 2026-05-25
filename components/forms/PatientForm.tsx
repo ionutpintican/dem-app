@@ -4,6 +4,17 @@ import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
 
+const CATEGORII_FISIER = [
+  { value: "ct",          label: "CT / PET-CT" },
+  { value: "rmn",         label: "RMN" },
+  { value: "ecografie",   label: "Ecografie" },
+  { value: "radiografie", label: "Radiografie" },
+  { value: "biopsie",     label: "Biopsie / Histopatologie" },
+  { value: "analize",     label: "Analize de laborator" },
+  { value: "scrisoare",   label: "Scrisoare medicală" },
+  { value: "altele",      label: "Altele" },
+];
+
 const patientSchema = z.object({
   nume: z.string().min(2, "Numele trebuie să aibă cel puțin 2 caractere"),
   prenume: z.string().min(2, "Prenumele trebuie să aibă cel puțin 2 caractere"),
@@ -43,11 +54,13 @@ export default function PatientForm() {
     gdpr: false,
   });
   const [files, setFiles] = useState<File[]>([]);
+  const [fileCategories, setFileCategories] = useState<Record<string, string>>({});
   const [errors, setErrors] = useState<FieldErrors>({});
   const [fileError, setFileError] = useState<string>("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [eroareServer, setEroareServer] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     const { name, value, type } = e.target;
@@ -74,11 +87,18 @@ export default function PatientForm() {
       const names = new Set(prev.map((f) => f.name));
       return [...prev, ...selected.filter((f) => !names.has(f.name))];
     });
+    setFileCategories((prev) => {
+      const updated = { ...prev };
+      selected.forEach((f) => { if (!(f.name in updated)) updated[f.name] = "altele"; });
+      return updated;
+    });
   }
 
   function removeFile(name: string) {
     setFiles((prev) => prev.filter((f) => f.name !== name));
+    setFileCategories((prev) => { const u = { ...prev }; delete u[name]; return u; });
     if (fileInputRef.current) fileInputRef.current.value = "";
+    if (cameraInputRef.current) cameraInputRef.current.value = "";
   }
 
   function fileIcon(mime: string) {
@@ -108,7 +128,10 @@ export default function PatientForm() {
     try {
       const formData = new FormData();
       Object.entries(fields).forEach(([k, v]) => formData.append(k, String(v)));
-      files.forEach((f) => formData.append("fisiere", f));
+      files.forEach((f, i) => {
+        formData.append("fisiere", f);
+        formData.append(`categorie_${i}`, fileCategories[f.name] ?? "altele");
+      });
 
       const res = await fetch("/api/cazuri/nou", { method: "POST", body: formData });
       const data = await res.json();
@@ -289,6 +312,8 @@ export default function PatientForm() {
         <label className="block text-sm font-medium text-slate-700 mb-1">
           Documente medicale <span className="text-slate-400 font-normal">(opțional)</span>
         </label>
+
+        {/* Drag & drop zone */}
         <div
           onClick={() => fileInputRef.current?.click()}
           onDragOver={(e) => e.preventDefault()}
@@ -318,27 +343,66 @@ export default function PatientForm() {
             onChange={handleFiles}
           />
         </div>
+
+        {/* Buton cameră — pe mobil deschide direct camera */}
+        <button
+          type="button"
+          onClick={() => cameraInputRef.current?.click()}
+          className="mt-2 w-full flex items-center justify-center gap-2 py-2.5 border border-slate-300 rounded-xl text-sm text-slate-600 hover:bg-slate-50 hover:border-slate-400 transition-colors"
+        >
+          <svg className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+              d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          Fotografiați un document cu camera
+        </button>
+        <input
+          ref={cameraInputRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="hidden"
+          onChange={handleFiles}
+        />
+
         {fileError && <p className="mt-1 text-xs text-red-600">{fileError}</p>}
 
         {files.length > 0 && (
           <ul className="mt-3 space-y-2">
             {files.map((f) => (
-              <li key={f.name} className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
-                <span className="flex items-center gap-2 text-sm text-slate-700 truncate">
-                  <span>{fileIcon(f.type)}</span>
-                  <span className="truncate max-w-[220px]">{f.name}</span>
-                  <span className="text-slate-400 shrink-0">({formatBytes(f.size)})</span>
-                </span>
-                <button
-                  type="button"
-                  onClick={() => removeFile(f.name)}
-                  className="ml-2 text-slate-400 hover:text-red-500 transition-colors shrink-0"
-                  aria-label="Elimină fișier"
-                >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
+              <li key={f.name} className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center gap-2 text-sm text-slate-700 truncate">
+                    <span>{fileIcon(f.type)}</span>
+                    <span className="truncate max-w-[200px]">{f.name}</span>
+                    <span className="text-slate-400 shrink-0 text-xs">({formatBytes(f.size)})</span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => removeFile(f.name)}
+                    className="ml-2 text-slate-400 hover:text-red-500 transition-colors shrink-0"
+                    aria-label="Elimină fișier"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                <div className="mt-2 flex items-center gap-2">
+                  <label className="text-xs text-slate-500 shrink-0">Categorie:</label>
+                  <select
+                    value={fileCategories[f.name] ?? "altele"}
+                    onChange={(e) =>
+                      setFileCategories((prev) => ({ ...prev, [f.name]: e.target.value }))
+                    }
+                    className="flex-1 text-xs border border-slate-300 rounded-lg px-2 py-1 text-slate-700 bg-white focus:outline-none focus:ring-1 focus:ring-blue-300 focus:border-blue-400 transition-colors"
+                  >
+                    {CATEGORII_FISIER.map((cat) => (
+                      <option key={cat.value} value={cat.value}>{cat.label}</option>
+                    ))}
+                  </select>
+                </div>
               </li>
             ))}
           </ul>
