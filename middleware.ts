@@ -42,15 +42,23 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // Protecție rută /admin – doar utilizatori cu rol admin
-  if (pathname.startsWith("/admin") && user) {
+  if (isProtected && user) {
     const { data: profile } = await supabase
       .from("users")
-      .select("role")
+      .select("role, is_active")
       .eq("id", user.id)
       .single();
 
-    if (profile?.role !== "admin") {
+    // Cont dezactivat sau șters — blocat imediat
+    if (!profile?.is_active) {
+      await supabase.auth.signOut();
+      const loginUrl = new URL("/autentificare", request.url);
+      loginUrl.searchParams.set("eroare", "cont-dezactivat");
+      return NextResponse.redirect(loginUrl);
+    }
+
+    // Rută /admin — doar admin
+    if (pathname.startsWith("/admin") && profile?.role !== "admin") {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
   }

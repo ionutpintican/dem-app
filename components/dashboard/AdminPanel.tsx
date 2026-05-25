@@ -351,6 +351,85 @@ function ModalEditareCont({
   );
 }
 
+// ─── Modal confirmare ștergere cont ──────────────────────────────────────────
+function ModalStergeCont({
+  utilizator,
+  onClose,
+  onSuccess,
+}: {
+  utilizator: Utilizator;
+  onClose: () => void;
+  onSuccess: () => void;
+}) {
+  const [eroare, setEroare] = useState("");
+  const [pending, startTransition] = useTransition();
+
+  function handleSterge() {
+    setEroare("");
+    startTransition(async () => {
+      const res = await fetch(`/api/admin/users/${utilizator.id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setEroare(data.error ?? "Eroare la ștergerea contului.");
+        return;
+      }
+      onSuccess();
+    });
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+            <svg className="w-5 h-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-lg font-bold text-slate-900">Șterge cont</h2>
+            <p className="text-sm text-slate-500">{utilizator.full_name ?? utilizator.email}</p>
+          </div>
+        </div>
+
+        <p className="text-sm text-slate-600 mb-3">
+          Doctorul nu va mai putea accesa aplicația. Contribuțiile medicale și concluziile sale din cazurile existente
+          vor rămâne în sistem.
+        </p>
+        <p className="text-xs text-slate-400 mb-6">Această acțiune nu poate fi anulată.</p>
+
+        {eroare && (
+          <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 mb-4">
+            {eroare}
+          </div>
+        )}
+
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={pending}
+            className="flex-1 py-2.5 rounded-lg border border-slate-300 text-slate-700 font-medium hover:bg-slate-50 transition-colors disabled:opacity-50"
+          >
+            Anulează
+          </button>
+          <button
+            type="button"
+            onClick={handleSterge}
+            disabled={pending}
+            className="flex-1 py-2.5 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {pending ? "Se șterge..." : "Șterge contul"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Componenta principală AdminPanel ─────────────────────────────────────────
 export default function AdminPanel({
   utilizatoriInitiali,
@@ -361,6 +440,7 @@ export default function AdminPanel({
   const [utilizatori, setUtilizatori] = useState<Utilizator[]>(utilizatoriInitiali);
   const [afiseazaModalNou, setAfiseazaModalNou] = useState(false);
   const [utilizatorDeEditat, setUtilizatorDeEditat] = useState<Utilizator | null>(null);
+  const [utilizatorDesters, setUtilizatorDesters] = useState<Utilizator | null>(null);
   const [eroareToggle, setEroareToggle] = useState<string>("");
   const [cautare, setCautare] = useState("");
   const [filtruRol, setFiltruRol] = useState("");
@@ -416,6 +496,12 @@ export default function AdminPanel({
     router.refresh();
   }
 
+  function laContSters(id: string) {
+    setUtilizatori((prev) => prev.filter((u) => u.id !== id));
+    setUtilizatorDesters(null);
+    router.refresh();
+  }
+
   return (
     <>
       {/* Modals */}
@@ -430,6 +516,13 @@ export default function AdminPanel({
           utilizator={utilizatorDeEditat}
           onClose={() => setUtilizatorDeEditat(null)}
           onSuccess={(schimbari) => laContEditat(utilizatorDeEditat.id, schimbari)}
+        />
+      )}
+      {utilizatorDesters && (
+        <ModalStergeCont
+          utilizator={utilizatorDesters}
+          onClose={() => setUtilizatorDesters(null)}
+          onSuccess={() => laContSters(utilizatorDesters.id)}
         />
       )}
 
@@ -547,12 +640,26 @@ export default function AdminPanel({
 
                     {/* Acțiuni */}
                     <td className="px-5 py-4 text-right">
-                      <button
-                        onClick={() => setUtilizatorDeEditat(u)}
-                        className="text-xs font-medium text-slate-600 hover:text-blue-600 transition-colors px-3 py-1.5 rounded-lg hover:bg-blue-50"
-                      >
-                        Editează
-                      </button>
+                      <div className="flex items-center justify-end gap-1">
+                        <button
+                          onClick={() => setUtilizatorDeEditat(u)}
+                          className="text-xs font-medium text-slate-600 hover:text-blue-600 transition-colors px-3 py-1.5 rounded-lg hover:bg-blue-50"
+                        >
+                          Editează
+                        </button>
+                        {u.role !== "admin" && (
+                          <button
+                            onClick={() => setUtilizatorDesters(u)}
+                            className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            title="Șterge cont"
+                          >
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}

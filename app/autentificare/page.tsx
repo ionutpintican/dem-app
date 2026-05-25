@@ -14,6 +14,7 @@ function FormAutentificare() {
   const searchParams = useSearchParams();
   const parolaResetata = searchParams.get("resetat") === "1";
   const linkExpirat = searchParams.get("eroare") === "link-expirat";
+  const contDezactivat = searchParams.get("eroare") === "cont-dezactivat";
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -60,6 +61,12 @@ function FormAutentificare() {
             <Link href="/resetare-parola" className="font-medium underline hover:no-underline">
               Solicită unul nou.
             </Link>
+          </div>
+        )}
+
+        {contDezactivat && (
+          <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 mb-5">
+            Acest cont a fost dezactivat. Contactează administratorul pentru detalii.
           </div>
         )}
 

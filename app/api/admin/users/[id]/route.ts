@@ -75,3 +75,73 @@ export async function PATCH(
 
   return NextResponse.json({ success: true });
 }
+
+// DELETE /api/admin/users/[id] — ștergere cont doctor
+export async function DELETE(
+  _request: Request,
+  { params }: { params: { id: string } }
+) {
+  const admin = await verificaAdmin();
+  if (!admin) {
+    return NextResponse.json({ error: "Acces interzis" }, { status: 403 });
+  }
+
+  const { id } = params;
+  const service = createServiceClient();
+
+  if (id === admin.id) {
+    return NextResponse.json({ error: "Nu poți șterge propriul cont." }, { status: 400 });
+  }
+
+  const { data: tinta } = await service
+    .from("users")
+    .select("role, is_coordinator, full_name")
+    .eq("id", id)
+    .single() as unknown as { data: { role: string; is_coordinator: boolean; full_name: string | null } | null; error: unknown };
+
+  if (!tinta) {
+    return NextResponse.json({ error: "Utilizatorul nu există." }, { status: 404 });
+  }
+  if (tinta.role === "admin") {
+    return NextResponse.json({ error: "Nu poți șterge un cont de administrator." }, { status: 400 });
+  }
+
+  // Nu poți șterge singurul coordonator activ
+  if (tinta.is_coordinator) {
+    const { data: coordonatori } = await service
+      .from("users")
+      .select("id")
+      .eq("is_coordinator", true)
+      .eq("is_active", true) as unknown as { data: { id: string }[] | null; error: unknown };
+
+    const altiiActivi = (coordonatori ?? []).filter((c) => c.id !== id);
+    if (altiiActivi.length === 0) {
+      return NextResponse.json(
+        { error: "Nu poți șterge singurul Coordonator activ. Asignează mai întâi un alt Coordonator." },
+        { status: 400 }
+      );
+    }
+  }
+
+  // Pas 1: soft delete — întotdeauna reușește, blochează accesul prin middleware
+  await service
+    .from("users")
+    .update({ is_active: false, is_coordinator: false } as never)
+    .eq("id", id);
+
+  // Pas 2: ștergere din auth (reușește dacă doctorul nu are contribuții; altfel eșuează silențios)
+  // FK RESTRICT pe specialist_inputs împiedică ștergerea dacă există contribuții — soft delete e suficient
+  await service.auth.admin.deleteUser(id).catch(() => null);
+
+  // Audit
+  try {
+    await service.from("audit_logs").insert({
+      action: "delete",
+      table_name: "users",
+      record_id: id,
+      notes: `Cont șters de admin: ${tinta.full_name ?? id}`,
+    } as never);
+  } catch { /* non-blocking */ }
+
+  return NextResponse.json({ success: true });
+}
