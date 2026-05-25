@@ -49,20 +49,20 @@ export async function DELETE(
   }
 
   // Șterge înregistrările dependente explicit (pentru cazul fără CASCADE)
-  await service.from("case_files").delete().eq("case_id", cazId);
-  await service.from("specialist_inputs").delete().eq("case_id", cazId);
+  const { error: errFiles } = await service
+    .from("case_files").delete().eq("case_id", cazId) as { error: unknown };
+  const { error: errInputs } = await service
+    .from("specialist_inputs").delete().eq("case_id", cazId) as { error: unknown };
 
-  // Audit log înainte de ștergere (case_id va deveni NULL după)
-  try {
-    await service.from("audit_logs").insert({
-      user_id: user.id,
-      action: "delete",
-      resource_type: "cases",
-      resource_id: cazId,
-      case_id: cazId,
-      notes: "Caz șters de administrator",
-    } as never);
-  } catch { /* ignorăm */ }
+  // Disociază referințele din tabelele cu logging (în caz că FK nu e SET NULL)
+  const { error: errAudit } = await service
+    .from("audit_logs").update({ case_id: null } as never).eq("case_id", cazId) as { error: unknown };
+  const { error: errEmail } = await service
+    .from("email_log").update({ case_id: null } as never).eq("case_id", cazId) as { error: unknown };
+
+  if (errFiles || errInputs) {
+    console.error("Eroare ștergere asociate:", { errFiles, errInputs, errAudit, errEmail });
+  }
 
   const { error: deleteError } = await service
     .from("cases")
@@ -71,11 +71,23 @@ export async function DELETE(
 
   if (deleteError) {
     console.error("Eroare ștergere caz:", deleteError);
+    const msg = (deleteError as { message?: string })?.message ?? "necunoscut";
     return NextResponse.json(
-      { error: "Eroare la ștergere. Verifică dacă există înregistrări asociate." },
+      { error: `Eroare la ștergere: ${msg}` },
       { status: 500 }
     );
   }
+
+  // Audit log după ștergerea reușită
+  try {
+    await service.from("audit_logs").insert({
+      user_id: user.id,
+      action: "delete",
+      resource_type: "cases",
+      resource_id: cazId,
+      notes: `Caz șters de administrator (ID: ${cazId})`,
+    } as never);
+  } catch { /* ignorăm */ }
 
   return NextResponse.json({ success: true }, { status: 200 });
 }
