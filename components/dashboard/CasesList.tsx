@@ -58,11 +58,13 @@ function ModalConfirmareSterge({
   onConfirm,
   onAnuleaza,
   loading,
+  eroare,
 }: {
   caz: CazPreview;
   onConfirm: () => void;
   onAnuleaza: () => void;
   loading: boolean;
+  eroare: string | null;
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
@@ -85,9 +87,15 @@ function ModalConfirmareSterge({
           <p className="text-xs text-slate-500 mt-0.5">{caz.patient_email}</p>
         </div>
 
-        <p className="text-sm text-slate-600 mb-6">
+        <p className="text-sm text-slate-600 mb-5">
           Ești sigur că vrei să ștergi definitiv acest caz? Toate datele asociate (inputuri specialiști, fișiere, concluzii) vor fi eliminate permanent.
         </p>
+
+        {eroare && (
+          <div className="mb-4 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
+            {eroare}
+          </div>
+        )}
 
         <div className="flex gap-3">
           <button
@@ -132,6 +140,7 @@ export default function CasesList({
   const [filtruStatus, setFiltruStatus] = useState("");
   const [cazDeSters, setCazDeSters] = useState<CazPreview | null>(null);
   const [loadingSterge, setLoadingSterge] = useState(false);
+  const [eroareSterge, setEroareSterge] = useState<string | null>(null);
 
   const cazuriFiltrate = cazuri.filter((c) => {
     const potrivitCautare =
@@ -145,12 +154,18 @@ export default function CasesList({
   async function handleSterge() {
     if (!cazDeSters) return;
     setLoadingSterge(true);
+    setEroareSterge(null);
     try {
       const res = await fetch(`/api/cazuri/${cazDeSters.id}`, { method: "DELETE" });
       if (res.ok) {
         setCazDeSters(null);
         router.refresh();
+      } else {
+        const body = await res.json().catch(() => ({}));
+        setEroareSterge((body as { error?: string }).error ?? "Eroare la ștergere.");
       }
+    } catch {
+      setEroareSterge("Eroare de rețea. Încearcă din nou.");
     } finally {
       setLoadingSterge(false);
     }
@@ -162,8 +177,9 @@ export default function CasesList({
         <ModalConfirmareSterge
           caz={cazDeSters}
           onConfirm={handleSterge}
-          onAnuleaza={() => setCazDeSters(null)}
+          onAnuleaza={() => { setCazDeSters(null); setEroareSterge(null); }}
           loading={loadingSterge}
+          eroare={eroareSterge}
         />
       )}
 

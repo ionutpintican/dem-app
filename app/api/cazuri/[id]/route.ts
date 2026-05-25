@@ -30,13 +30,29 @@ export async function DELETE(
     .from("cases")
     .select("id")
     .eq("id", cazId)
-    .single() as unknown as {
-      data: { id: string } | null;
-      error: unknown;
-    };
+    .single() as unknown as { data: { id: string } | null; error: unknown };
 
   if (!caz) return NextResponse.json({ error: "Caz negăsit" }, { status: 404 });
 
+  // Șterge fișierele din storage înainte de a șterge înregistrările din DB
+  const { data: fisiere } = await service
+    .from("case_files")
+    .select("file_path")
+    .eq("case_id", cazId) as unknown as {
+      data: { file_path: string }[] | null;
+      error: unknown;
+    };
+
+  if (fisiere && fisiere.length > 0) {
+    const cai = fisiere.map((f) => f.file_path);
+    await service.storage.from("medical-files").remove(cai);
+  }
+
+  // Șterge înregistrările dependente explicit (pentru cazul fără CASCADE)
+  await service.from("case_files").delete().eq("case_id", cazId);
+  await service.from("specialist_inputs").delete().eq("case_id", cazId);
+
+  // Audit log înainte de ștergere (case_id va deveni NULL după)
   try {
     await service.from("audit_logs").insert({
       user_id: user.id,
@@ -48,13 +64,17 @@ export async function DELETE(
     } as never);
   } catch { /* ignorăm */ }
 
-  const { error } = await service
+  const { error: deleteError } = await service
     .from("cases")
     .delete()
     .eq("id", cazId) as { error: unknown };
 
-  if (error) {
-    return NextResponse.json({ error: "Eroare la ștergere" }, { status: 500 });
+  if (deleteError) {
+    console.error("Eroare ștergere caz:", deleteError);
+    return NextResponse.json(
+      { error: "Eroare la ștergere. Verifică dacă există înregistrări asociate." },
+      { status: 500 }
+    );
   }
 
   return NextResponse.json({ success: true }, { status: 200 });
