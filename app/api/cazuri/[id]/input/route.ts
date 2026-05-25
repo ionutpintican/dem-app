@@ -65,12 +65,13 @@ export async function POST(
     return NextResponse.json({ error: "Caz negăsit" }, { status: 404 });
   }
 
-  // Caută input existent al acestui user pentru acest caz
+  // Caută input existent al acestui user pentru acest caz (exclusiv concluzia de coordonator)
   const { data: inputExistent } = await service
     .from("specialist_inputs")
     .select("id")
     .eq("case_id", cazId)
     .eq("user_id", user.id)
+    .eq("is_coordinator_conclusion", false)
     .single() as unknown as {
       data: { id: string } | null;
       error: unknown;

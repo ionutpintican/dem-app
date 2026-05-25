@@ -4,6 +4,16 @@ import { useState } from "react";
 import Link from "next/link";
 import { STATUS_CONFIG, TOTAL_OBLIGATORII } from "@/lib/constante";
 
+const LUNI = ["ian.", "feb.", "mar.", "apr.", "mai", "iun.", "iul.", "aug.", "sep.", "oct.", "nov.", "dec."];
+
+function formatData(dateStr: string): string {
+  const d = new Date(dateStr);
+  const zi = String(d.getUTCDate()).padStart(2, "0");
+  const luna = LUNI[d.getUTCMonth()];
+  const an = d.getUTCFullYear();
+  return `${zi} ${luna} ${an}`;
+}
+
 export type CazPreview = {
   id: string;
   patient_name: string;
@@ -121,9 +131,7 @@ export default function CasesList({ cazuri }: { cazuri: CazPreview[] }) {
                       <p className="text-xs text-slate-400 mt-0.5">{caz.patient_email}</p>
                     </td>
                     <td className="px-4 py-4 text-slate-500 whitespace-nowrap">
-                      {new Date(caz.created_at).toLocaleDateString("ro-RO", {
-                        day: "2-digit", month: "short", year: "numeric",
-                      })}
+                      {formatData(caz.created_at)}
                     </td>
                     <td className="px-4 py-4">
                       <BadgeStatus status={caz.status} />

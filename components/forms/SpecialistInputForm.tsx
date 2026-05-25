@@ -8,10 +8,11 @@ import { ETICHETA_ROL } from "@/lib/roluri";
 type Props = {
   cazId: string;
   rol: string;
+  cazStatus: string;
   inputExistent: Record<string, string> | null;
 };
 
-export default function SpecialistInputForm({ cazId, rol, inputExistent }: Props) {
+export default function SpecialistInputForm({ cazId, rol, cazStatus, inputExistent }: Props) {
   const campuri = CAMPURI_PER_ROL[rol] ?? [];
   const router = useRouter();
 
@@ -26,6 +27,7 @@ export default function SpecialistInputForm({ cazId, rol, inputExistent }: Props
   const [stare, setStare] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [eroare, setEroare] = useState("");
   const [editeaza, setEditeaza] = useState(!inputExistent);
+  const esteFinalizat = cazStatus === "trimis" || cazStatus === "arhivat";
 
   if (!campuri.length) return null;
 
@@ -65,13 +67,20 @@ export default function SpecialistInputForm({ cazId, rol, inputExistent }: Props
           <h2 className="text-sm font-semibold text-slate-700 uppercase tracking-wide">
             Evaluarea mea — {etichetaRol}
           </h2>
-          <button
-            onClick={() => setEditeaza(true)}
-            className="text-xs font-medium text-blue-600 hover:text-blue-700 px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-colors"
-          >
-            Editează
-          </button>
+          {!esteFinalizat && (
+            <button
+              onClick={() => setEditeaza(true)}
+              className="text-xs font-medium text-blue-600 hover:text-blue-700 px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-colors"
+            >
+              Editează
+            </button>
+          )}
         </div>
+        {esteFinalizat && (
+          <p className="text-xs text-slate-400 italic mb-3">
+            Fișa a fost trimisă pacientului. Coordonatorul poate redeschide fișa pentru modificări.
+          </p>
+        )}
 
         {stare === "success" && (
           <p className="mb-3 text-xs text-green-700 bg-green-50 px-3 py-2 rounded-lg font-medium">

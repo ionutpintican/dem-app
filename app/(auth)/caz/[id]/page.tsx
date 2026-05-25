@@ -329,6 +329,7 @@ export default async function CazPage({ params }: { params: { id: string } }) {
               <SpecialistInputForm
                 cazId={id}
                 rol={profil?.role ?? ""}
+                cazStatus={caz.status}
                 inputExistent={contentulMeu}
               />
             )}

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
 export default function AutentificarePage() {
@@ -10,6 +11,9 @@ export default function AutentificarePage() {
   const [eroare, setEroare] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const parolaResetata = searchParams.get("resetat") === "1";
+  const linkExpirat = searchParams.get("eroare") === "link-expirat";
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -52,9 +56,27 @@ export default function AutentificarePage() {
         {/* Card */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
           <h1 className="text-2xl font-bold text-slate-900 mb-1">Bine ai revenit</h1>
-          <p className="text-slate-500 text-sm mb-8">
+          <p className="text-slate-500 text-sm mb-1">
+            Autentificare personal medical și administrativ
+          </p>
+          <p className="text-slate-400 text-xs mb-8">
             Autentifică-te cu datele primite de la administrator.
           </p>
+
+          {parolaResetata && (
+            <div className="rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700 mb-5">
+              Parola a fost resetată cu succes. Te poți autentifica cu parola nouă.
+            </div>
+          )}
+
+          {linkExpirat && (
+            <div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-700 mb-5">
+              Link-ul de resetare a expirat sau este invalid.{" "}
+              <Link href="/resetare-parola" className="font-medium underline hover:no-underline">
+                Solicită unul nou.
+              </Link>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-5" noValidate>
             <div>
@@ -74,9 +96,17 @@ export default function AutentificarePage() {
             </div>
 
             <div>
-              <label htmlFor="parola" className="block text-sm font-medium text-slate-700 mb-1.5">
-                Parolă
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label htmlFor="parola" className="block text-sm font-medium text-slate-700">
+                  Parolă
+                </label>
+                <Link
+                  href="/resetare-parola"
+                  className="text-xs text-blue-600 hover:text-blue-700 transition-colors"
+                >
+                  Ai uitat parola?
+                </Link>
+              </div>
               <input
                 id="parola"
                 type="password"
@@ -122,6 +152,31 @@ export default function AutentificarePage() {
             Contactează administratorul sistemului.
           </span>
         </p>
+
+        <div className="mt-5">
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-slate-200" />
+            </div>
+            <div className="relative flex justify-center">
+              <span className="bg-slate-50 px-3 text-xs text-slate-400 uppercase tracking-wide">
+                Pentru pacienți
+              </span>
+            </div>
+          </div>
+          <div className="mt-4">
+            <Link
+              href="/"
+              className="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl border-2 border-blue-200 bg-blue-50 text-blue-700 font-semibold text-sm hover:bg-blue-100 hover:border-blue-300 transition-colors"
+            >
+              <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Depune o cerere medicală
+            </Link>
+          </div>
+        </div>
 
       </div>
     </main>

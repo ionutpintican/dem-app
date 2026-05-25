@@ -273,22 +273,6 @@ function emailDecizieFinala({
           </td>
         </tr>` : ""}
 
-        <!-- Pași următori -->
-        <tr>
-          <td style="padding:0 32px 32px;">
-            <div style="background:#f8fafc;border-radius:10px;padding:18px 20px;">
-              <p style="margin:0 0 10px;font-size:13px;font-weight:600;color:#0f172a;">
-                Ce faceți cu această decizie?
-              </p>
-              <ul style="margin:0;padding-left:20px;color:#475569;font-size:13px;line-height:1.9;">
-                <li>Prezentați acest email medicului dumneavoastră de familie sau medicului curant.</li>
-                <li>Urmați recomandările echipei și programați consultațiile indicate.</li>
-                <li>Păstrați ID-ul dosarului (<strong>${idScurt}</strong>) pentru referințe viitoare.</li>
-              </ul>
-            </div>
-          </td>
-        </tr>
-
         <!-- Footer -->
         <tr>
           <td style="padding:20px 32px;background:#f8fafc;border-top:1px solid #e2e8f0;text-align:center;">

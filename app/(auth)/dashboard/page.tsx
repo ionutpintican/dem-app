@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { logout } from "@/lib/auth/actions";
 import Link from "next/link";
 import CasesList, { type CazPreview } from "@/components/dashboard/CasesList";
+import FeedbackModal from "@/components/dashboard/FeedbackModal";
 import { ETICHETA_ROL } from "@/lib/roluri";
 import { ROLURI_OBLIGATORII } from "@/lib/constante";
 
@@ -99,6 +100,12 @@ export default async function DashboardPage() {
           </div>
 
           <div className="flex items-center gap-4">
+            {!esteAdmin && (
+              <FeedbackModal
+                numeUtilizator={profil?.full_name ?? user.email ?? ""}
+                rolUtilizator={etichetaRol}
+              />
+            )}
             <div className="hidden sm:flex flex-col items-end">
               <span className="text-sm font-medium text-slate-900">
                 {profil?.full_name ?? user.email}

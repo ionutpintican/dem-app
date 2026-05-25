@@ -31,6 +31,9 @@ export default function CoordinatorPanel({
   const [stareTriimitere, setStareTriimitere] = useState<"idle" | "confirmare" | "loading" | "trimis" | "error">("idle");
   const [eroareTriimitere, setEroareTriimitere] = useState("");
 
+  const [stareRedeschidere, setStareRedeschidere] = useState<"idle" | "confirmare" | "loading" | "error">("idle");
+  const [eroareRedeschidere, setEroareRedeschidere] = useState("");
+
   const esteFinalizat = cazStatus === "trimis" || cazStatus === "arhivat";
   const areConcluzieCompletata = decizie.trim().length > 0;
   const toateLipsa = roluriLipsa.length > 0;
@@ -69,6 +72,24 @@ export default function CoordinatorPanel({
     }
   }
 
+  // ─── Redeschidere fișă ──────────────────────────────────────────────────────
+  async function redeschideFisa() {
+    setStareRedeschidere("loading");
+    setEroareRedeschidere("");
+
+    try {
+      const resp = await fetch(`/api/cazuri/${cazId}/redeschide`, { method: "POST" });
+      if (!resp.ok) {
+        const data = await resp.json();
+        throw new Error(data.error ?? "Eroare necunoscută");
+      }
+      router.refresh();
+    } catch (err) {
+      setStareRedeschidere("error");
+      setEroareRedeschidere(err instanceof Error ? err.message : "Eroare la redeschidere");
+    }
+  }
+
   // ─── Trimitere email ────────────────────────────────────────────────────────
   async function trimiteDecizia() {
     setStareTriimitere("loading");
@@ -95,8 +116,8 @@ export default function CoordinatorPanel({
   // ─── Starea "deja trimis" ───────────────────────────────────────────────────
   if (cazStatus === "trimis") {
     return (
-      <div className="bg-green-50 rounded-xl border border-green-200 p-5">
-        <div className="flex items-center gap-3 mb-3">
+      <div className="bg-green-50 rounded-xl border border-green-200 p-5 space-y-4">
+        <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center shrink-0">
             <svg className="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -107,8 +128,9 @@ export default function CoordinatorPanel({
             <p className="text-xs text-green-600 mt-0.5">Email trimis la {patientEmail}</p>
           </div>
         </div>
+
         {concluzieExistenta?.decizie_finala && (
-          <div className="mt-3 bg-white rounded-lg border border-green-200 p-4">
+          <div className="bg-white rounded-lg border border-green-200 p-4">
             <p className="text-xs text-slate-400 mb-1">Decizia finală</p>
             <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">
               {concluzieExistenta.decizie_finala}
@@ -122,6 +144,47 @@ export default function CoordinatorPanel({
               </>
             )}
           </div>
+        )}
+
+        {/* Redeschidere fișă */}
+        {eroareRedeschidere && (
+          <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{eroareRedeschidere}</p>
+        )}
+
+        {stareRedeschidere === "confirmare" ? (
+          <div className="bg-white rounded-lg border border-amber-200 p-4 space-y-3">
+            <p className="text-sm text-slate-700">
+              Redeschiderea fișei permite medicilor să editeze evaluările și coordonatorului să
+              trimită din nou decizia. Ești sigur?
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={redeschideFisa}
+                disabled={stareRedeschidere === "loading"}
+                className="flex-1 px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700 transition-colors disabled:opacity-60"
+              >
+                Da, redeschide fișa
+              </button>
+              <button
+                onClick={() => setStareRedeschidere("idle")}
+                className="px-4 py-2 bg-slate-100 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-200 transition-colors"
+              >
+                Anulează
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={() => setStareRedeschidere("confirmare")}
+            disabled={stareRedeschidere === "loading"}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-amber-300 text-amber-700 text-sm font-medium hover:bg-amber-50 transition-colors disabled:opacity-50"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            {stareRedeschidere === "loading" ? "Se redeschide..." : "Redeschide fișa pentru modificări"}
+          </button>
         )}
       </div>
     );

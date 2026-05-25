@@ -39,8 +39,7 @@ export default function HomePage() {
           Depune o cerere medicală
         </h1>
         <p className="text-slate-600 max-w-xl mx-auto leading-relaxed">
-          Completează formularul de mai jos și un specialist din echipa noastră
-          te va contacta în termen de <strong>24–48 de ore</strong>.
+          Completează formularul de mai jos și un specialist din echipa noastră te va contacta cu decizia medicală.
         </p>
 
         {/* Pași */}
@@ -48,7 +47,7 @@ export default function HomePage() {
           {[
             { nr: "1", label: "Completezi formularul" },
             { nr: "2", label: "Analizăm cererea" },
-            { nr: "3", label: "Te contactăm" },
+            { nr: "3", label: "Te contactăm prin email" },
           ].map((pas, i) => (
             <div key={pas.nr} className="flex items-center">
               <div className="flex flex-col items-center px-3">
