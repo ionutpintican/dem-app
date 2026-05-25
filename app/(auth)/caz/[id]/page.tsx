@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ETICHETA_ROL } from "@/lib/roluri";
 import { STATUS_CONFIG, ROLURI_OBLIGATORII, TOTAL_OBLIGATORII } from "@/lib/constante";
 import SpecialistInputForm from "@/components/forms/SpecialistInputForm";
+import CoordinatorPanel from "@/components/forms/CoordinatorPanel";
 
 const ETICHETA_CATEGORIE: Record<string, string> = {
   analiza: "Analiză",
@@ -119,13 +120,24 @@ export default async function CazPage({ params }: { params: { id: string } }) {
   const nrCompletati = roluriCompletate.size;
   const statusCfg = STATUS_CONFIG[caz.status] ?? STATUS_CONFIG.nou;
 
-  // Inputul curentului utilizator (dacă există)
+  // Inputul curentului utilizator (dacă există) — exclusiv concluzia de coordonator
   const inputulMeu = profil?.role !== "admin"
-    ? ((inputuri ?? []).find((i) => i.user_id === user.id) ?? null)
+    ? ((inputuri ?? []).find((i) => i.user_id === user.id && !i.is_coordinator_conclusion) ?? null)
     : null;
   const contentulMeu = inputulMeu
     ? (inputulMeu.content as Record<string, string>)
     : null;
+
+  // Concluzia coordonatorului (dacă există)
+  const concluzieCoord = (inputuri ?? []).find((i) => i.is_coordinator_conclusion) ?? null;
+  const contentConcluzieCoord = concluzieCoord
+    ? (concluzieCoord.content as { decizie_finala?: string; recomandari?: string })
+    : null;
+
+  // Roluri obligatorii care nu au completat încă (pentru afișaj în CoordinatorPanel)
+  const roluriLipsa = (ROLURI_OBLIGATORII as readonly string[]).filter(
+    (r) => !roluriCompletate.has(r)
+  );
 
   function formatBytes(bytes: number | null) {
     if (!bytes) return "";
@@ -300,6 +312,17 @@ export default async function CazPage({ params }: { params: { id: string } }) {
                 })}
               </div>
             </div>
+
+            {/* Panoul coordonatorului */}
+            {profil?.is_coordinator && (
+              <CoordinatorPanel
+                cazId={id}
+                cazStatus={caz.status}
+                patientEmail={caz.patient_email}
+                concluzieExistenta={contentConcluzieCoord}
+                roluriLipsa={roluriLipsa}
+              />
+            )}
 
             {/* Formularul specialistului curent */}
             {profil?.role !== "admin" && (
