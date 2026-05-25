@@ -32,8 +32,8 @@ export default function CoordinatorPanel({
   const [eroareTriimitere, setEroareTriimitere] = useState("");
 
   const esteFinalizat = cazStatus === "trimis" || cazStatus === "arhivat";
-  const esteGataExpediere = cazStatus === "gata_expediere";
   const areConcluzieCompletata = decizie.trim().length > 0;
+  const toateLipsa = roluriLipsa.length > 0;
 
   // ─── Salvare concluzie ──────────────────────────────────────────────────────
   async function salveazaConcluzia(e: React.FormEvent) {
@@ -245,20 +245,34 @@ export default function CoordinatorPanel({
         {/* ── Secțiunea 2: Trimitere email ── */}
         {!esteFinalizat && (
           <div className={`rounded-lg border p-4 ${
-            esteGataExpediere && areConcluzieCompletata
-              ? "border-blue-200 bg-blue-50"
+            areConcluzieCompletata
+              ? toateLipsa
+                ? "border-orange-200 bg-orange-50"
+                : "border-blue-200 bg-blue-50"
               : "border-slate-200 bg-slate-50"
           }`}>
 
-            {/* Lipsesc roluri */}
-            {roluriLipsa.length > 0 && (
+            {/* Info: toți au completat */}
+            {!toateLipsa && areConcluzieCompletata && (
+              <div className="mb-3 flex items-center gap-2">
+                <svg className="w-4 h-4 text-blue-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <p className="text-xs text-blue-700 font-medium">
+                  Toți specialiștii obligatorii au completat evaluarea.
+                </p>
+              </div>
+            )}
+
+            {/* Avertisment: lipsesc specialiști */}
+            {toateLipsa && areConcluzieCompletata && (
               <div className="mb-3 flex items-start gap-2">
-                <svg className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-4 h-4 text-orange-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                     d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
-                <p className="text-xs text-amber-700">
-                  <span className="font-semibold">Așteptând: </span>
+                <p className="text-xs text-orange-700">
+                  <span className="font-semibold">Evaluări lipsă: </span>
                   {roluriLipsa.map((r) => ETICHETA_ROL[r] ?? r).join(", ")}
                 </p>
               </div>
@@ -267,24 +281,12 @@ export default function CoordinatorPanel({
             {/* Concluzie lipsă */}
             {!areConcluzieCompletata && (
               <div className="mb-3 flex items-start gap-2">
-                <svg className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <p className="text-xs text-amber-700">
-                  Adaugă concluzia finală înainte de trimitere.
-                </p>
-              </div>
-            )}
-
-            {/* Gata de trimitere */}
-            {esteGataExpediere && areConcluzieCompletata && (
-              <div className="mb-3 flex items-center gap-2">
-                <svg className="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <p className="text-xs text-blue-700 font-medium">
-                  Toți specialiștii obligatorii au completat. Cazul este gata de expediere.
+                <p className="text-xs text-slate-500">
+                  Completează concluzia finală pentru a putea trimite decizia.
                 </p>
               </div>
             )}
@@ -302,40 +304,77 @@ export default function CoordinatorPanel({
               </p>
             )}
 
-            {/* Confirmare trimitere */}
-            {stareTriimitere === "confirmare" ? (
-              <div className="bg-white rounded-lg border border-blue-200 p-3 space-y-3">
-                <p className="text-sm text-slate-700">
-                  Ești sigur că vrei să trimiți decizia finală?{" "}
-                  <span className="font-medium text-slate-900">Această acțiune nu poate fi anulată.</span>
-                </p>
+            {/* Popup confirmare */}
+            {(stareTriimitere === "confirmare" || stareTriimitere === "loading") ? (
+              <div className={`bg-white rounded-lg border p-4 space-y-3 ${
+                toateLipsa ? "border-orange-300" : "border-blue-200"
+              }`}>
+                {toateLipsa ? (
+                  // Confirmare cu avertisment — lipsesc specialiști
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <svg className="w-4 h-4 text-orange-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                      </svg>
+                      <p className="text-sm font-semibold text-orange-800">Atenție — evaluări incomplete</p>
+                    </div>
+                    <p className="text-sm text-slate-600 mb-1">
+                      Următorii specialiști <span className="font-medium text-slate-800">nu au completat</span> evaluarea:
+                    </p>
+                    <ul className="mb-3 space-y-0.5">
+                      {roluriLipsa.map((r) => (
+                        <li key={r} className="text-sm text-orange-700 flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-orange-400 shrink-0" />
+                          {ETICHETA_ROL[r] ?? r}
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="text-sm text-slate-700">
+                      Ești sigur că vrei să trimiți decizia <span className="font-semibold">acum</span>?{" "}
+                      <span className="text-slate-500">Această acțiune nu poate fi anulată.</span>
+                    </p>
+                  </div>
+                ) : (
+                  // Confirmare normală — toți au completat
+                  <p className="text-sm text-slate-700">
+                    Ești sigur că vrei să trimiți decizia finală la{" "}
+                    <span className="font-medium text-slate-900">{patientEmail}</span>?{" "}
+                    <span className="text-slate-500">Această acțiune nu poate fi anulată.</span>
+                  </p>
+                )}
+
                 <div className="flex gap-2">
                   <button
                     onClick={trimiteDecizia}
-                    disabled={stareTriimitere === "loading" as never}
-                    className="flex-1 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                    disabled={stareTriimitere === "loading"}
+                    className={`flex-1 px-4 py-2 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
+                      toateLipsa
+                        ? "bg-orange-600 hover:bg-orange-700"
+                        : "bg-blue-600 hover:bg-blue-700"
+                    }`}
                   >
-                    Da, trimite decizia
+                    {stareTriimitere === "loading" ? "Se trimite..." : "Da, trimite decizia"}
                   </button>
                   <button
                     onClick={() => setStareTriimitere("idle")}
-                    className="px-4 py-2 bg-slate-100 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-200 transition-colors"
+                    disabled={stareTriimitere === "loading"}
+                    className="px-4 py-2 bg-slate-100 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-200 transition-colors disabled:opacity-50"
                   >
                     Anulează
                   </button>
                 </div>
               </div>
             ) : (
+              // Buton principal — activ ori de câte ori există concluzie
               <button
-                onClick={() => {
-                  if (esteGataExpediere && areConcluzieCompletata) {
-                    setStareTriimitere("confirmare");
-                  }
-                }}
-                disabled={!esteGataExpediere || !areConcluzieCompletata}
+                onClick={() => areConcluzieCompletata && setStareTriimitere("confirmare")}
+                disabled={!areConcluzieCompletata}
                 className={`w-full flex items-center justify-center gap-2 px-5 py-3 rounded-lg text-sm font-semibold transition-colors ${
-                  esteGataExpediere && areConcluzieCompletata
-                    ? "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+                  areConcluzieCompletata
+                    ? toateLipsa
+                      ? "bg-orange-500 text-white hover:bg-orange-600 cursor-pointer"
+                      : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
                     : "bg-slate-200 text-slate-400 cursor-not-allowed"
                 }`}
               >

@@ -60,12 +60,6 @@ export async function POST(
   if (caz.status === "arhivat") {
     return NextResponse.json({ error: "Cazul este arhivat" }, { status: 409 });
   }
-  if (caz.status !== "gata_expediere") {
-    return NextResponse.json(
-      { error: "Cazul nu este gata de expediere — nu toți specialiștii obligatorii au completat" },
-      { status: 422 }
-    );
-  }
 
   // Preia toate inputurile
   const { data: inputuri } = await service
