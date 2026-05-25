@@ -23,7 +23,8 @@ export default function ResetareParolaPage() {
 
     if (error) {
       setStare("eroare");
-      setEroare("A apărut o eroare. Verifică adresa de email și încearcă din nou.");
+      setEroare(`A apărut o eroare: ${error.message}`);
+      console.error("Eroare resetPasswordForEmail:", error);
       return;
     }
 

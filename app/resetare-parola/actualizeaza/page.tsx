@@ -33,10 +33,13 @@ export default function ActualizeazaParolaPage() {
 
     if (error) {
       setStare("eroare");
+      const mesaj = error.message.toLowerCase();
       setEroare(
-        error.message.includes("session")
+        mesaj.includes("session")
           ? "Sesiunea a expirat. Solicită un nou link de resetare."
-          : "A apărut o eroare. Încearcă din nou."
+          : mesaj.includes("same") || mesaj.includes("different from the old")
+          ? "Parola nouă trebuie să fie diferită de cea veche."
+          : `A apărut o eroare: ${error.message}`
       );
       return;
     }
@@ -83,7 +86,7 @@ export default function ActualizeazaParolaPage() {
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
           <h1 className="text-2xl font-bold text-slate-900 mb-1">Parolă nouă</h1>
           <p className="text-slate-500 text-sm mb-8">
-            Alege o parolă sigură de cel puțin 8 caractere.
+            Alege o parolă sigură de cel puțin 8 caractere, diferită de cea veche.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-5" noValidate>
