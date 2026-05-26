@@ -1,6 +1,6 @@
 # 001 — Skeleton loading pe pagina /profil
 
-**Status:** Approved
+**Status:** Verified ✅
 **Prioritate:** Joasă
 **Effort:** S (~15 min)
 **Data:** 2026-05-26

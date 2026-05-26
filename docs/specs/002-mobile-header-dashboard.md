@@ -1,6 +1,6 @@
 # 002 — Header dashboard pe mobil: nu se aglomerează
 
-**Status:** Approved
+**Status:** Verified ✅ (static via curl + HTML inspection; browser resize n-a coborât sub 500px pe Windows)
 **Prioritate:** Medie
 **Effort:** S (~20 min)
 **Data:** 2026-05-26

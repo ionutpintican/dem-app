@@ -1,6 +1,6 @@
 # 003 — HeaderBrand consistent pe pagina /caz/[id]
 
-**Status:** Approved
+**Status:** Verified ✅
 **Prioritate:** Medie
 **Effort:** S (~15 min)
 **Data:** 2026-05-26
