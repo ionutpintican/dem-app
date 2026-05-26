@@ -60,12 +60,6 @@ export const ECHIPA: Doctor[] = [
     categorie: "radiologie",
   },
   {
-    nume: "Dr. Popița Cristian",
-    specialitate: "Medic primar radiologie și imagistică medicală",
-    imgUrl: "https://ctm.iocn.ro/wp-content/uploads/2023/01/Dr-Cristian-Popita-ctm.jpg",
-    categorie: "radiologie",
-  },
-  {
     nume: "Dr. Alexandra Andries",
     specialitate: "Medic specialist radiologie și imagistică medicală",
     imgUrl: "https://ctm.iocn.ro/wp-content/uploads/2023/01/dr-Alexandra-Andries_ctm.jpg",

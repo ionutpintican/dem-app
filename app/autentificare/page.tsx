@@ -138,47 +138,17 @@ function FormAutentificare() {
         </form>
       </div>
 
-      {/* Info cont */}
-      <p className="text-center text-sm text-slate-500 mt-6">
-        Nu ai cont?{" "}
-        <span className="text-slate-700 font-medium">
-          Contactează administratorul sistemului.
-        </span>
-      </p>
-
-      <div className="mt-5">
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-slate-200" />
-          </div>
-          <div className="relative flex justify-center">
-            <span className="bg-slate-50 px-3 text-xs text-slate-400 uppercase tracking-wide">
-              Pentru pacienți
-            </span>
-          </div>
-        </div>
-        <div className="mt-4 space-y-2">
-          <Link
-            href="/"
-            className="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl border-2 border-rose-200 bg-rose-50 text-rose-500 font-semibold text-sm hover:bg-rose-100 hover:border-rose-300 transition-colors"
-          >
-            <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            Depune o cerere medicală
-          </Link>
-          <Link
-            href="/echipa"
-            className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl border border-slate-200 text-slate-500 text-sm hover:bg-slate-50 hover:text-slate-700 transition-colors"
-          >
-            <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            Cunoaște echipa medicală
-          </Link>
-        </div>
+      <div className="mt-6">
+        <Link
+          href="/"
+          className="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl border-2 border-rose-200 bg-rose-50 text-rose-500 font-semibold text-sm hover:bg-rose-100 hover:border-rose-300 transition-colors"
+        >
+          <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+              d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Solicită asistență medicală
+        </Link>
       </div>
     </>
   );
