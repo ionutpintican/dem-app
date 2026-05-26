@@ -99,26 +99,38 @@ export default async function DashboardPage() {
             )}
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             {!esteAdmin && (
               <FeedbackModal
                 numeUtilizator={profil?.full_name ?? user.email ?? ""}
                 rolUtilizator={etichetaRol}
               />
             )}
-            <div className="hidden sm:flex flex-col items-end">
-              <span className="text-sm font-medium text-slate-900">
-                {profil?.full_name ?? user.email}
-              </span>
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs text-slate-500">{etichetaRol}</span>
-                {esteCoordinator && (
-                  <span className="text-xs bg-amber-100 text-amber-700 font-medium px-1.5 py-0.5 rounded">
-                    Coordonator
-                  </span>
-                )}
+            <Link
+              href="/profil"
+              className="flex items-center gap-2.5 px-3 py-2 rounded-lg border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-colors"
+              title="Profilul meu"
+            >
+              <div className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                <svg className="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
               </div>
-            </div>
+              <div className="hidden sm:flex flex-col items-start">
+                <span className="text-sm font-medium text-slate-900 leading-tight">
+                  {profil?.full_name ?? user.email}
+                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs text-slate-500">{etichetaRol}</span>
+                  {esteCoordinator && (
+                    <span className="text-xs bg-amber-100 text-amber-700 font-medium px-1.5 py-0.5 rounded">
+                      Coordonator
+                    </span>
+                  )}
+                </div>
+              </div>
+            </Link>
             <form action={logout}>
               <button type="submit"
                 className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-red-600 transition-colors px-3 py-1.5 rounded-lg hover:bg-red-50"
