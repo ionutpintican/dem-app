@@ -6,6 +6,7 @@ import { ETICHETA_ROL } from "@/lib/roluri";
 import { STATUS_CONFIG, ROLURI_OBLIGATORII, TOTAL_OBLIGATORII } from "@/lib/constante";
 import SpecialistInputForm from "@/components/forms/SpecialistInputForm";
 import CoordinatorPanel from "@/components/forms/CoordinatorPanel";
+import HeaderBrand from "@/components/layout/HeaderBrand";
 
 const ETICHETA_CATEGORIE: Record<string, string> = {
   analiza: "Analiză",
@@ -150,18 +151,19 @@ export default async function CazPage({ params }: { params: { id: string } }) {
 
       {/* Header */}
       <header className="bg-white/90 backdrop-blur-sm border-b border-slate-200 shadow-sm">
-        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href="/dashboard" className="flex items-center gap-2 text-slate-500 hover:text-slate-900 transition-colors">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              <span className="text-sm">Dashboard</span>
-            </Link>
-            <span className="text-slate-300">/</span>
-            <span className="text-sm font-medium text-slate-900 truncate max-w-[200px]">
-              {caz.patient_name}
-            </span>
+        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4 min-w-0">
+            <HeaderBrand href="/dashboard" />
+            <div className="hidden md:flex items-center gap-2 text-sm text-slate-500 min-w-0">
+              <span className="text-slate-300">/</span>
+              <Link href="/dashboard" className="hover:text-slate-900 transition-colors">
+                Dashboard
+              </Link>
+              <span className="text-slate-300">/</span>
+              <span className="font-medium text-slate-900 truncate max-w-[240px]">
+                {caz.patient_name}
+              </span>
+            </div>
           </div>
           <div className="flex items-center gap-4">
             <div className="hidden sm:flex flex-col items-end">
@@ -169,7 +171,7 @@ export default async function CazPage({ params }: { params: { id: string } }) {
               <span className="text-xs text-slate-500">{ETICHETA_ROL[profil?.role ?? ""] ?? profil?.role}</span>
             </div>
             <form action={logout}>
-              <button type="submit" className="text-sm text-slate-400 hover:text-red-600 transition-colors px-2 py-1.5 rounded-lg hover:bg-red-50">
+              <button type="submit" aria-label="Deconectare" className="text-sm text-slate-400 hover:text-red-600 transition-colors px-2 py-1.5 rounded-lg hover:bg-red-50">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                     d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

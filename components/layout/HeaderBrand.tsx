@@ -22,11 +22,11 @@ export default function HeaderBrand({ href = "/", marime = "normal" }: Props) {
         style={{ height: dimensiuneLogo, width: "auto" }}
         priority
       />
-      <div className="flex flex-col leading-tight border-l border-slate-200 pl-2.5">
+      <div className="hidden sm:flex flex-col leading-tight border-l border-slate-200 pl-2.5">
         <span className={`${titluClass} font-bold text-green-800`}>
           Decizia Oncologică
         </span>
-        <span className={`${subtitluClass} text-slate-500 hidden sm:block`}>
+        <span className={`${subtitluClass} text-slate-500`}>
           Platformă IOCN Cluj-Napoca
         </span>
       </div>

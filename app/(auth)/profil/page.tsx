@@ -122,14 +122,6 @@ export default function ProfilPage() {
 
   const esteAdmin = profil?.role === "admin";
 
-  if (incarcare) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-5 h-5 border-2 border-green-700 border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen">
 
@@ -147,8 +139,17 @@ export default function ProfilPage() {
           </div>
 
           <div className="hidden sm:flex flex-col items-end">
-            <span className="text-sm font-medium text-slate-900">{profil?.full_name ?? profil?.email}</span>
-            <span className="text-xs text-slate-500">{ETICHETA_ROL[profil?.role ?? ""] ?? profil?.role}</span>
+            {incarcare ? (
+              <>
+                <div className="h-4 w-32 bg-slate-200 rounded animate-pulse mb-1" />
+                <div className="h-3 w-20 bg-slate-100 rounded animate-pulse" />
+              </>
+            ) : (
+              <>
+                <span className="text-sm font-medium text-slate-900">{profil?.full_name ?? profil?.email}</span>
+                <span className="text-xs text-slate-500">{ETICHETA_ROL[profil?.role ?? ""] ?? profil?.role}</span>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -157,11 +158,55 @@ export default function ProfilPage() {
       <main className="max-w-3xl mx-auto px-4 py-10 space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Profilul meu</h1>
-          <p className="text-slate-500 mt-1 text-sm">
-            {profil?.email}
-          </p>
+          {incarcare ? (
+            <div className="h-4 w-56 bg-slate-200 rounded animate-pulse mt-2" />
+          ) : (
+            <p className="text-slate-500 mt-1 text-sm">
+              {profil?.email}
+            </p>
+          )}
         </div>
 
+        {/* Skeleton sau conținut real */}
+        {incarcare ? (
+          <>
+            {/* Skeleton card specializare */}
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-8 h-8 rounded-lg bg-slate-100 animate-pulse" />
+                <div className="flex-1 space-y-1.5">
+                  <div className="h-4 w-40 bg-slate-200 rounded animate-pulse" />
+                  <div className="h-3 w-56 bg-slate-100 rounded animate-pulse" />
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div className="h-3 w-24 bg-slate-100 rounded animate-pulse" />
+                <div className="h-10 w-full bg-slate-100 rounded-lg animate-pulse" />
+                <div className="h-10 w-44 bg-slate-200 rounded-lg animate-pulse" />
+              </div>
+            </div>
+            {/* Skeleton card parolă */}
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-8 h-8 rounded-lg bg-slate-100 animate-pulse" />
+                <div className="flex-1 space-y-1.5">
+                  <div className="h-4 w-36 bg-slate-200 rounded animate-pulse" />
+                  <div className="h-3 w-60 bg-slate-100 rounded animate-pulse" />
+                </div>
+              </div>
+              <div className="space-y-4">
+                {[0, 1, 2].map((i) => (
+                  <div key={i} className="space-y-1.5">
+                    <div className="h-3 w-28 bg-slate-100 rounded animate-pulse" />
+                    <div className="h-10 w-full bg-slate-100 rounded-lg animate-pulse" />
+                  </div>
+                ))}
+                <div className="h-10 w-36 bg-slate-200 rounded-lg animate-pulse" />
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
         {/* Secțiune Specializare */}
         {!esteAdmin && (
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
@@ -321,6 +366,8 @@ export default function ProfilPage() {
             </button>
           </form>
         </div>
+          </>
+        )}
       </main>
     </div>
   );
