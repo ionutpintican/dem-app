@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
@@ -189,7 +189,7 @@ export default function PatientForm() {
             className={`w-full px-4 py-2.5 rounded-lg border text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 transition-colors ${
               errors.nume
                 ? "border-red-400 focus:ring-red-300 bg-red-50"
-                : "border-slate-300 focus:ring-blue-300 focus:border-blue-400"
+                : "border-slate-300 focus:ring-green-300 focus:border-green-400"
             }`}
           />
           {errors.nume && <p className="mt-1 text-xs text-red-600">{errors.nume}</p>}
@@ -210,7 +210,7 @@ export default function PatientForm() {
             className={`w-full px-4 py-2.5 rounded-lg border text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 transition-colors ${
               errors.prenume
                 ? "border-red-400 focus:ring-red-300 bg-red-50"
-                : "border-slate-300 focus:ring-blue-300 focus:border-blue-400"
+                : "border-slate-300 focus:ring-green-300 focus:border-green-400"
             }`}
           />
           {errors.prenume && <p className="mt-1 text-xs text-red-600">{errors.prenume}</p>}
@@ -233,7 +233,7 @@ export default function PatientForm() {
           className={`w-full px-4 py-2.5 rounded-lg border text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 transition-colors ${
             errors.email
               ? "border-red-400 focus:ring-red-300 bg-red-50"
-              : "border-slate-300 focus:ring-blue-300 focus:border-blue-400"
+              : "border-slate-300 focus:ring-green-300 focus:border-green-400"
           }`}
         />
         {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email}</p>}
@@ -255,7 +255,7 @@ export default function PatientForm() {
             className={`w-full px-4 py-2.5 rounded-lg border text-slate-900 focus:outline-none focus:ring-2 transition-colors ${
               errors.dataNasterii
                 ? "border-red-400 focus:ring-red-300 bg-red-50"
-                : "border-slate-300 focus:ring-blue-300 focus:border-blue-400"
+                : "border-slate-300 focus:ring-green-300 focus:border-green-400"
             }`}
           />
           {errors.dataNasterii && <p className="mt-1 text-xs text-red-600">{errors.dataNasterii}</p>}
@@ -273,7 +273,7 @@ export default function PatientForm() {
             value={fields.telefon}
             onChange={handleChange}
             placeholder="07xx xxx xxx"
-            className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400 transition-colors"
+            className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 transition-colors"
           />
         </div>
       </div>
@@ -293,7 +293,7 @@ export default function PatientForm() {
           className={`w-full px-4 py-2.5 rounded-lg border text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 transition-colors resize-none ${
             errors.descriere
               ? "border-red-400 focus:ring-red-300 bg-red-50"
-              : "border-slate-300 focus:ring-blue-300 focus:border-blue-400"
+              : "border-slate-300 focus:ring-green-300 focus:border-green-400"
           }`}
         />
         <div className="flex justify-between mt-1">
@@ -325,13 +325,13 @@ export default function PatientForm() {
               handleFiles(synth);
             }
           }}
-          className="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors"
+          className="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center cursor-pointer hover:border-green-400 hover:bg-green-50 transition-colors"
         >
           <svg className="mx-auto mb-2 w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
           </svg>
           <p className="text-sm text-slate-600">
-            <span className="font-medium text-blue-600">Selectează fișiere</span> sau trage aici
+            <span className="font-medium text-green-700">Selectează fișiere</span> sau trage aici
           </p>
           <p className="text-xs text-slate-400 mt-1">JPG, PNG, WEBP, PDF, DOC, DOCX — max. {MAX_FILE_SIZE_MB} MB per fișier</p>
           <input
@@ -396,7 +396,7 @@ export default function PatientForm() {
                     onChange={(e) =>
                       setFileCategories((prev) => ({ ...prev, [f.name]: e.target.value }))
                     }
-                    className="flex-1 text-xs border border-slate-300 rounded-lg px-2 py-1 text-slate-700 bg-white focus:outline-none focus:ring-1 focus:ring-blue-300 focus:border-blue-400 transition-colors"
+                    className="flex-1 text-xs border border-slate-300 rounded-lg px-2 py-1 text-slate-700 bg-white focus:outline-none focus:ring-1 focus:ring-green-300 focus:border-green-400 transition-colors"
                   >
                     {CATEGORII_FISIER.map((cat) => (
                       <option key={cat.value} value={cat.value}>{cat.label}</option>
@@ -417,13 +417,13 @@ export default function PatientForm() {
             type="checkbox"
             checked={fields.gdpr}
             onChange={handleChange}
-            className="mt-0.5 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-300 shrink-0"
+            className="mt-0.5 h-4 w-4 rounded border-slate-300 text-green-700 focus:ring-green-300 shrink-0"
           />
           <span className="text-sm text-slate-700 leading-relaxed">
             <span className="font-medium">Consimțământ prelucrare date cu caracter personal</span>
             {" — "}
-            Sunt de acord ca datele mele personale, inclusiv datele medicale furnizate, să fie prelucrate de echipa DEM în scopul analizării și soluționării cererii mele, în conformitate cu{" "}
-            <span className="text-blue-600 font-medium">Regulamentul UE 679/2016 (GDPR)</span>.
+            Sunt de acord ca datele mele personale, inclusiv datele medicale furnizate, să fie prelucrate de echipa medicală a Institutului Oncologic „Prof. Dr. Ion Chiricuță” Cluj-Napoca în scopul analizării și soluționării cererii mele, în conformitate cu{" "}
+            <span className="text-green-700 font-medium">Regulamentul UE 679/2016 (GDPR)</span>.
             Înțeleg că am dreptul de acces, rectificare și ștergere a datelor.
             <span className="text-red-500 ml-1">*</span>
           </span>
@@ -442,7 +442,7 @@ export default function PatientForm() {
       <button
         type="submit"
         disabled={status === "loading"}
-        className="w-full py-3 px-6 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 active:bg-blue-800 disabled:opacity-60 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+        className="w-full py-3 px-6 bg-green-700 text-white font-semibold rounded-xl hover:bg-green-800 active:bg-green-900 disabled:opacity-60 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2"
       >
         {status === "loading" ? (
           <span className="flex items-center justify-center gap-2">

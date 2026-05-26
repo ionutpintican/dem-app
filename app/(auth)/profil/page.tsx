@@ -1,8 +1,9 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { ROLURI_MEDICALE, ETICHETA_ROL } from "@/lib/roluri";
+import HeaderBrand from "@/components/layout/HeaderBrand";
 
 const supabase = createClient();
 
@@ -123,28 +124,20 @@ export default function ProfilPage() {
 
   if (incarcare) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-5 h-5 border-2 border-green-700 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen">
 
       {/* Header */}
-      <header className="bg-white border-b border-slate-200 shadow-sm">
+      <header className="bg-white/90 backdrop-blur-sm border-b border-slate-200 shadow-sm">
         <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              </div>
-              <span className="text-lg font-bold text-slate-900">DEM</span>
-            </div>
+            <HeaderBrand href="/dashboard" />
             <button
               onClick={() => { window.location.href = "/dashboard"; }}
               className="text-sm text-slate-500 hover:text-slate-900 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors"
@@ -173,8 +166,8 @@ export default function ProfilPage() {
         {!esteAdmin && (
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
-                <svg className="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center">
+                <svg className="w-4 h-4 text-green-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
@@ -195,7 +188,7 @@ export default function ProfilPage() {
                   value={rolNou}
                   onChange={(e) => { setRolNou(e.target.value); setStareRol("idle"); }}
                   disabled={stareRol === "loading"}
-                  className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400 transition-colors disabled:opacity-60"
+                  className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 transition-colors disabled:opacity-60"
                 >
                   {ROLURI_MEDICALE.map((r) => (
                     <option key={r.valoare} value={r.valoare}>{r.eticheta}</option>
@@ -217,7 +210,7 @@ export default function ProfilPage() {
               <button
                 type="submit"
                 disabled={stareRol === "loading" || rolNou === profil?.role}
-                className="px-5 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+                className="px-5 py-2.5 bg-green-700 text-white rounded-lg text-sm font-semibold hover:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2"
               >
                 {stareRol === "loading" ? (
                   <span className="flex items-center gap-2">
@@ -261,7 +254,7 @@ export default function ProfilPage() {
                 value={parolaVeche}
                 onChange={(e) => { setParolaVeche(e.target.value); setStareParola("idle"); }}
                 disabled={stareParola === "loading"}
-                className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400 transition-colors disabled:opacity-60"
+                className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 transition-colors disabled:opacity-60"
                 placeholder="••••••••"
               />
             </div>
@@ -278,7 +271,7 @@ export default function ProfilPage() {
                 value={parolaNoua}
                 onChange={(e) => { setParolaNoua(e.target.value); setStareParola("idle"); }}
                 disabled={stareParola === "loading"}
-                className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400 transition-colors disabled:opacity-60"
+                className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 transition-colors disabled:opacity-60"
                 placeholder="Minim 8 caractere"
               />
             </div>
@@ -295,7 +288,7 @@ export default function ProfilPage() {
                 value={confirmaParola}
                 onChange={(e) => { setConfirmaParola(e.target.value); setStareParola("idle"); }}
                 disabled={stareParola === "loading"}
-                className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400 transition-colors disabled:opacity-60"
+                className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 transition-colors disabled:opacity-60"
                 placeholder="••••••••"
               />
             </div>

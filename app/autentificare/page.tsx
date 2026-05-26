@@ -1,9 +1,10 @@
-"use client";
+﻿"use client";
 
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import HeaderBrand from "@/components/layout/HeaderBrand";
 
 function FormAutentificare() {
   const [email, setEmail] = useState("");
@@ -83,7 +84,7 @@ function FormAutentificare() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="doctor@spital.ro"
-              className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400 transition-colors"
+              className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 transition-colors"
             />
           </div>
 
@@ -94,7 +95,7 @@ function FormAutentificare() {
               </label>
               <Link
                 href="/resetare-parola"
-                className="text-xs text-blue-600 hover:text-blue-700 transition-colors"
+                className="text-xs text-green-700 hover:text-green-800 transition-colors"
               >
                 Ai uitat parola?
               </Link>
@@ -107,7 +108,7 @@ function FormAutentificare() {
               value={parola}
               onChange={(e) => setParola(e.target.value)}
               placeholder="••••••••"
-              className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400 transition-colors"
+              className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 transition-colors"
             />
           </div>
 
@@ -120,7 +121,7 @@ function FormAutentificare() {
           <button
             type="submit"
             disabled={loading || !email || !parola}
-            className="w-full py-2.5 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+            className="w-full py-2.5 bg-green-700 text-white rounded-lg font-semibold hover:bg-green-800 active:bg-green-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2"
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">
@@ -159,7 +160,7 @@ function FormAutentificare() {
         <div className="mt-4">
           <Link
             href="/"
-            className="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl border-2 border-blue-200 bg-blue-50 text-blue-700 font-semibold text-sm hover:bg-blue-100 hover:border-blue-300 transition-colors"
+            className="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl border-2 border-green-200 bg-green-50 text-green-800 font-semibold text-sm hover:bg-green-100 hover:border-green-300 transition-colors"
           >
             <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -175,20 +176,12 @@ function FormAutentificare() {
 
 export default function AutentificarePage() {
   return (
-    <main className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
+    <main className="min-h-screen flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-md">
 
         {/* Logo */}
         <div className="flex justify-center mb-8">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
-            <span className="text-xl font-bold text-slate-900">DEM</span>
-          </div>
+          <HeaderBrand href="/" />
         </div>
 
         <Suspense fallback={null}>

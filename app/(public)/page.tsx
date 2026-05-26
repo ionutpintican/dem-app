@@ -1,26 +1,19 @@
-import PatientForm from "@/components/forms/PatientForm";
+﻿import PatientForm from "@/components/forms/PatientForm";
+import HeaderBrand from "@/components/layout/HeaderBrand";
 
 export const metadata = {
-  title: "Depune o cerere | DEM",
+  title: "Depune o cerere | Decizia Oncologică",
   description:
     "Completează formularul pentru a depune o cerere medicală. Un specialist te va contacta în 24–48 de ore.",
 };
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-slate-50">
+    <div className="min-h-screen">
       {/* Header */}
-      <header className="bg-white border-b border-slate-200 shadow-sm">
+      <header className="bg-white/90 backdrop-blur-sm border-b border-slate-200 shadow-sm">
         <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center">
-              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
-            <span className="text-lg font-bold text-slate-900">DEM</span>
-          </div>
+          <HeaderBrand href="/" />
           <a
             href="/autentificare"
             className="text-sm text-slate-600 hover:text-slate-900 font-medium transition-colors"
@@ -32,7 +25,7 @@ export default function HomePage() {
 
       {/* Hero */}
       <section className="max-w-3xl mx-auto px-4 pt-10 pb-6 text-center">
-        <span className="inline-block bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full mb-4 uppercase tracking-wide">
+        <span className="inline-block bg-green-100 text-green-800 text-xs font-semibold px-3 py-1 rounded-full mb-4 uppercase tracking-wide">
           Serviciu gratuit
         </span>
         <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-3">
@@ -51,7 +44,7 @@ export default function HomePage() {
           ].map((pas, i) => (
             <div key={pas.nr} className="flex items-center">
               <div className="flex flex-col items-center px-3">
-                <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm mb-1">
+                <div className="w-8 h-8 rounded-full bg-green-700 text-white flex items-center justify-center font-bold text-sm mb-1">
                   {pas.nr}
                 </div>
                 <span className="text-slate-600 text-xs text-center leading-tight max-w-[80px]">{pas.label}</span>

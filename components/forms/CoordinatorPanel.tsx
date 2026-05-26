@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -317,17 +317,17 @@ export default function CoordinatorPanel({
             areConcluzieCompletata
               ? toateLipsa
                 ? "border-orange-200 bg-orange-50"
-                : "border-blue-200 bg-blue-50"
+                : "border-green-200 bg-green-50"
               : "border-slate-200 bg-slate-50"
           }`}>
 
             {/* Info: toți au completat */}
             {!toateLipsa && areConcluzieCompletata && (
               <div className="mb-3 flex items-center gap-2">
-                <svg className="w-4 h-4 text-blue-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-4 h-4 text-green-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                <p className="text-xs text-blue-700 font-medium">
+                <p className="text-xs text-green-800 font-medium">
                   Toți specialiștii obligatorii au completat evaluarea.
                 </p>
               </div>
@@ -376,7 +376,7 @@ export default function CoordinatorPanel({
             {/* Popup confirmare */}
             {(stareTriimitere === "confirmare" || stareTriimitere === "loading") ? (
               <div className={`bg-white rounded-lg border p-4 space-y-3 ${
-                toateLipsa ? "border-orange-300" : "border-blue-200"
+                toateLipsa ? "border-orange-300" : "border-green-200"
               }`}>
                 {toateLipsa ? (
                   // Confirmare cu avertisment — lipsesc specialiști
@@ -420,7 +420,7 @@ export default function CoordinatorPanel({
                     className={`flex-1 px-4 py-2 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
                       toateLipsa
                         ? "bg-orange-600 hover:bg-orange-700"
-                        : "bg-blue-600 hover:bg-blue-700"
+                        : "bg-green-700 hover:bg-green-800"
                     }`}
                   >
                     {stareTriimitere === "loading" ? "Se trimite..." : "Da, trimite decizia"}
@@ -443,7 +443,7 @@ export default function CoordinatorPanel({
                   areConcluzieCompletata
                     ? toateLipsa
                       ? "bg-orange-500 text-white hover:bg-orange-600 cursor-pointer"
-                      : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+                      : "bg-green-700 text-white hover:bg-green-800 cursor-pointer"
                     : "bg-slate-200 text-slate-400 cursor-not-allowed"
                 }`}
               >

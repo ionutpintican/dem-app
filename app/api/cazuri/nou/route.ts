@@ -185,11 +185,11 @@ function emailConfirmarePacient({
 
         <!-- Header -->
         <tr>
-          <td style="background:#2563eb;padding:32px;text-align:center;">
-            <div style="display:inline-block;background:rgba(255,255,255,0.2);border-radius:12px;padding:10px 20px;">
-              <span style="color:#ffffff;font-size:20px;font-weight:700;letter-spacing:2px;">DEM</span>
+          <td style="background:#15803d;padding:32px;text-align:center;">
+            <div style="display:inline-block;background:rgba(255,255,255,0.18);border-radius:12px;padding:10px 22px;">
+              <span style="color:#ffffff;font-size:18px;font-weight:700;letter-spacing:0.5px;">Decizia Oncologică</span>
             </div>
-            <p style="color:#bfdbfe;margin:16px 0 0;font-size:14px;">Decizia Echipei Multidisciplinare</p>
+            <p style="color:#bbf7d0;margin:16px 0 0;font-size:13px;letter-spacing:0.5px;">Institutul Oncologic „Prof. Dr. Ion Chiricuță" Cluj-Napoca</p>
           </td>
         </tr>
 
@@ -204,10 +204,10 @@ function emailConfirmarePacient({
             </p>
 
             <!-- ID caz -->
-            <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:20px;margin-bottom:24px;text-align:center;">
-              <p style="margin:0 0 4px;color:#3b82f6;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;">ID cerere</p>
-              <p style="margin:0;color:#1e40af;font-size:28px;font-weight:700;letter-spacing:3px;font-family:monospace;">${idScurt}</p>
-              <p style="margin:8px 0 0;color:#93c5fd;font-size:11px;">Păstrează acest cod pentru referință</p>
+            <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:20px;margin-bottom:24px;text-align:center;">
+              <p style="margin:0 0 4px;color:#15803d;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;">ID cerere</p>
+              <p style="margin:0;color:#14532d;font-size:28px;font-weight:700;letter-spacing:3px;font-family:monospace;">${idScurt}</p>
+              <p style="margin:8px 0 0;color:#86efac;font-size:11px;">Păstrează acest cod pentru referință</p>
             </div>
 
             <!-- Rezumat -->
@@ -223,7 +223,7 @@ function emailConfirmarePacient({
               <tr>
                 <td style="padding:8px 0;vertical-align:top;">
                   <table cellpadding="0" cellspacing="0"><tr>
-                    <td style="width:28px;height:28px;background:#dbeafe;border-radius:50%;text-align:center;vertical-align:middle;font-size:13px;font-weight:700;color:#2563eb;">${i + 1}</td>
+                    <td style="width:28px;height:28px;background:#dcfce7;border-radius:50%;text-align:center;vertical-align:middle;font-size:13px;font-weight:700;color:#15803d;">${i + 1}</td>
                     <td style="padding-left:12px;color:#475569;font-size:14px;line-height:1.5;">${pas}</td>
                   </tr></table>
                 </td>

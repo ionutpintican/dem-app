@@ -146,10 +146,10 @@ export default async function CazPage({ params }: { params: { id: string } }) {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen">
 
       {/* Header */}
-      <header className="bg-white border-b border-slate-200 shadow-sm">
+      <header className="bg-white/90 backdrop-blur-sm border-b border-slate-200 shadow-sm">
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/dashboard" className="flex items-center gap-2 text-slate-500 hover:text-slate-900 transition-colors">
@@ -246,9 +246,9 @@ export default async function CazPage({ params }: { params: { id: string } }) {
                           href={f.downloadUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-3 p-2.5 rounded-lg border border-slate-200 hover:border-blue-300 hover:bg-blue-50 transition-colors group"
+                          className="flex items-center gap-3 p-2.5 rounded-lg border border-slate-200 hover:border-green-300 hover:bg-green-50 transition-colors group"
                         >
-                          <svg className="w-8 h-8 text-slate-300 group-hover:text-blue-400 shrink-0 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <svg className="w-8 h-8 text-slate-300 group-hover:text-green-400 shrink-0 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
                               d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                           </svg>
@@ -259,7 +259,7 @@ export default async function CazPage({ params }: { params: { id: string } }) {
                               {f.file_size ? ` · ${formatBytes(f.file_size)}` : ""}
                             </p>
                           </div>
-                          <svg className="w-4 h-4 text-slate-300 group-hover:text-blue-500 shrink-0 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <svg className="w-4 h-4 text-slate-300 group-hover:text-green-500 shrink-0 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                           </svg>
                         </a>
@@ -292,7 +292,7 @@ export default async function CazPage({ params }: { params: { id: string } }) {
               {/* Bara progres globală */}
               <div className="w-full bg-slate-100 rounded-full h-2 mb-5 overflow-hidden">
                 <div
-                  className={`h-full rounded-full transition-all ${nrCompletati === TOTAL_OBLIGATORII ? "bg-green-500" : "bg-blue-500"}`}
+                  className={`h-full rounded-full transition-all ${nrCompletati === TOTAL_OBLIGATORII ? "bg-green-500" : "bg-green-500"}`}
                   style={{ width: `${(nrCompletati / TOTAL_OBLIGATORII) * 100}%` }}
                 />
               </div>

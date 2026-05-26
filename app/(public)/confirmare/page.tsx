@@ -1,7 +1,7 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 export const metadata = {
-  title: "Cerere trimisă | DEM",
+  title: "Cerere trimisă | Decizia Oncologică",
 };
 
 export default function ConfirmarePage({
@@ -14,7 +14,7 @@ export default function ConfirmarePage({
     : null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-slate-50 flex items-center justify-center px-4">
+    <div className="min-h-screen flex items-center justify-center px-4 py-10">
       <div className="max-w-lg w-full text-center">
 
         {/* Iconița succes */}
@@ -38,7 +38,7 @@ export default function ConfirmarePage({
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">
               ID cerere
             </p>
-            <p className="text-3xl font-bold text-blue-600 tracking-widest font-mono">
+            <p className="text-3xl font-bold text-green-700 tracking-widest font-mono">
               {idScurt}
             </p>
             <p className="text-xs text-slate-400 mt-2">
@@ -57,7 +57,7 @@ export default function ConfirmarePage({
               "Când toți specialiștii au completat, primești decizia pe email.",
             ].map((pas, i) => (
               <div key={i} className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+                <div className="w-6 h-6 rounded-full bg-green-100 text-green-700 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
                   {i + 1}
                 </div>
                 <p className="text-sm text-slate-600 leading-relaxed">{pas}</p>

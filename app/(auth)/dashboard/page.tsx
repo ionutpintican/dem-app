@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+﻿import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { logout } from "@/lib/auth/actions";
@@ -7,6 +7,7 @@ import CasesList, { type CazPreview } from "@/components/dashboard/CasesList";
 import FeedbackModal from "@/components/dashboard/FeedbackModal";
 import { ETICHETA_ROL } from "@/lib/roluri";
 import { ROLURI_OBLIGATORII } from "@/lib/constante";
+import HeaderBrand from "@/components/layout/HeaderBrand";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -69,21 +70,13 @@ export default async function DashboardPage() {
   ).length;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen">
 
       {/* Header */}
-      <header className="bg-white border-b border-slate-200 shadow-sm">
+      <header className="bg-white/90 backdrop-blur-sm border-b border-slate-200 shadow-sm">
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              </div>
-              <span className="text-lg font-bold text-slate-900">DEM</span>
-            </div>
+            <HeaderBrand href="/dashboard" />
             {esteAdmin && (
               <nav className="hidden sm:flex items-center gap-1 ml-2">
                 <span className="text-sm font-semibold text-slate-900 px-3 py-1.5 bg-slate-100 rounded-lg">
@@ -111,8 +104,8 @@ export default async function DashboardPage() {
               className="flex items-center gap-2.5 px-3 py-2 rounded-lg border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-colors"
               title="Profilul meu"
             >
-              <div className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                <svg className="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                <svg className="w-4 h-4 text-green-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
@@ -162,7 +155,7 @@ export default async function DashboardPage() {
         {/* Statistici */}
         <div className="grid grid-cols-3 gap-4 mb-8">
           {[
-            { eticheta: "Cazuri noi", valoare: nrNou, culoare: "text-blue-600" },
+            { eticheta: "Cazuri noi", valoare: nrNou, culoare: "text-green-700" },
             { eticheta: "În lucru", valoare: nrInLucru, culoare: "text-amber-600" },
             { eticheta: "Finalizate", valoare: nrFinalizate, culoare: "text-green-600" },
           ].map((card) => (

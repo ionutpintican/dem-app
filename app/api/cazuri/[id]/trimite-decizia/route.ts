@@ -187,12 +187,13 @@ function emailDecizieFinala({
 
         <!-- Header -->
         <tr>
-          <td style="background:#1e40af;padding:32px;text-align:center;">
-            <div style="display:inline-block;background:rgba(255,255,255,0.15);border-radius:12px;padding:10px 24px;margin-bottom:12px;">
-              <span style="color:#ffffff;font-size:22px;font-weight:700;letter-spacing:3px;">DEM</span>
+          <td style="background:#15803d;padding:32px;text-align:center;">
+            <div style="display:inline-block;background:rgba(255,255,255,0.18);border-radius:12px;padding:10px 24px;margin-bottom:12px;">
+              <span style="color:#ffffff;font-size:18px;font-weight:700;letter-spacing:0.5px;">Decizia Oncologică</span>
             </div>
-            <p style="color:#bfdbfe;margin:0;font-size:13px;letter-spacing:1px;">
-              DECIZIA ECHIPEI MULTIDISCIPLINARE
+            <p style="color:#bbf7d0;margin:0;font-size:12px;letter-spacing:1px;line-height:1.6;">
+              DECIZIA ECHIPEI MULTIDISCIPLINARE<br>
+              <span style="font-size:11px;opacity:0.9;">Institutul Oncologic „Prof. Dr. Ion Chiricuță" Cluj-Napoca</span>
             </p>
           </td>
         </tr>
@@ -210,11 +211,11 @@ function emailDecizieFinala({
             </p>
 
             <!-- ID caz -->
-            <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;
+            <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;
               padding:12px 16px;margin-bottom:24px;display:flex;align-items:center;gap:12px;">
-              <span style="font-size:11px;font-weight:600;color:#3b82f6;text-transform:uppercase;
+              <span style="font-size:11px;font-weight:600;color:#15803d;text-transform:uppercase;
                 letter-spacing:1px;">ID dosar:</span>
-              <span style="font-size:15px;font-weight:700;color:#1e40af;
+              <span style="font-size:15px;font-weight:700;color:#14532d;
                 font-family:monospace;letter-spacing:2px;">${idScurt}</span>
             </div>
           </td>
@@ -277,7 +278,7 @@ function emailDecizieFinala({
         <tr>
           <td style="padding:20px 32px;background:#f8fafc;border-top:1px solid #e2e8f0;text-align:center;">
             <p style="margin:0;color:#94a3b8;font-size:11px;line-height:1.8;">
-              Acest document a fost generat automat de sistemul DEM.<br>
+              Acest document a fost generat automat de platforma Decizia Oncologică (IOCN Cluj-Napoca).<br>
               Datele dumneavoastră sunt protejate conform
               <strong>Regulamentului UE 679/2016 (GDPR)</strong>.<br>
               Vă rugăm să nu răspundeți la acest mesaj.
