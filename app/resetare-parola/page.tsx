@@ -15,7 +15,8 @@ export default function ResetareParolaPage() {
     setEroare("");
 
     const supabase = createClient();
-    const redirectTo = `${window.location.origin}/resetare-parola/actualizeaza`;
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
+    const redirectTo = `${baseUrl}/auth/callback?next=/resetare-parola/actualizeaza`;
 
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
       redirectTo,
