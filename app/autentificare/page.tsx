@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -42,7 +42,7 @@ function FormAutentificare() {
     <>
       {/* Card */}
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
-        <h1 className="text-2xl font-bold text-slate-900 mb-1">Bine ai revenit</h1>
+        <h1 className="text-2xl font-bold text-slate-900 mb-1 text-pretty">Bine ai revenit</h1>
         <p className="text-slate-500 text-sm mb-1">
           Autentificare personal medical și administrativ
         </p>
@@ -78,13 +78,15 @@ function FormAutentificare() {
             </label>
             <input
               id="email"
+              name="email"
               type="email"
               autoComplete="email"
+              spellCheck={false}
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="doctor@spital.ro"
-              className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-rose-400 transition-colors"
+              className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-300 focus-visible:border-rose-400 transition-colors"
             />
           </div>
 
@@ -102,18 +104,19 @@ function FormAutentificare() {
             </div>
             <input
               id="parola"
+              name="password"
               type="password"
               autoComplete="current-password"
               required
               value={parola}
               onChange={(e) => setParola(e.target.value)}
               placeholder="••••••••"
-              className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-rose-400 transition-colors"
+              className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-300 focus-visible:border-rose-400 transition-colors"
             />
           </div>
 
           {eroare && (
-            <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+            <div role="alert" className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
               {eroare}
             </div>
           )}
@@ -121,15 +124,15 @@ function FormAutentificare() {
           <button
             type="submit"
             disabled={loading || !email || !parola}
-            className="w-full py-2.5 bg-rose-400 text-white rounded-lg font-semibold hover:bg-rose-500 active:bg-rose-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-rose-400 focus:ring-offset-2"
+            className="w-full py-2.5 bg-rose-400 text-white rounded-lg font-semibold hover:bg-rose-500 active:bg-rose-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2"
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">
-                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                <svg aria-hidden="true" className="animate-spin motion-reduce:animate-none h-4 w-4" viewBox="0 0 24 24" fill="none">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
                 </svg>
-                Se verifică...
+                Se verifică…
               </span>
             ) : (
               "Intră în cont"
@@ -141,9 +144,9 @@ function FormAutentificare() {
       <div className="mt-6">
         <Link
           href="/"
-          className="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl border-2 border-rose-200 bg-rose-50 text-rose-500 font-semibold text-sm hover:bg-rose-100 hover:border-rose-300 transition-colors"
+          className="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl border-2 border-rose-200 bg-rose-50 text-rose-500 font-semibold text-sm hover:bg-rose-100 hover:border-rose-300 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-300"
         >
-          <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg aria-hidden="true" className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
@@ -156,7 +159,7 @@ function FormAutentificare() {
 
 export default function AutentificarePage() {
   return (
-    <main className="min-h-screen flex items-center justify-center px-4 py-10">
+    <main id="main-content" className="min-h-screen flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-md">
 
         {/* Logo */}

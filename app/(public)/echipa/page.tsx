@@ -43,7 +43,7 @@ export default function EchipaPage() {
 
       {/* Hero */}
       <section className="max-w-6xl mx-auto px-4 pt-12 pb-8 text-center">
-        <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-3">
+        <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-3 text-pretty">
           Echipa medicală
         </h1>
         <p className="text-slate-600 max-w-2xl mx-auto leading-relaxed">
@@ -72,7 +72,7 @@ export default function EchipaPage() {
       <footer className="border-t border-slate-200 bg-white/60">
         <div className="max-w-6xl mx-auto px-4 py-6 flex flex-wrap justify-center gap-6 text-xs text-slate-400">
           <Link href="/" className="hover:text-slate-600 transition-colors">
-            Depune o cerere medicală
+            Solicită asistență medicală
           </Link>
           <span>·</span>
           <Link href="/autentificare" className="hover:text-slate-600 transition-colors">
