@@ -38,3 +38,8 @@ next-env.d.ts
 # documentatie interna (fisiere Word, PDF) — exceptam spec-urile SDD
 /docs/*
 !/docs/specs/
+
+# agent skills (instalate local, nu fac parte din cod)
+/.agents/
+/.claude/skills/
+/skills-lock.json
