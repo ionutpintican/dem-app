@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { ROLURI_MEDICALE, ETICHETA_ROL } from "@/lib/roluri";
-import Link from "next/link";
+
+const supabase = createClient();
 
 type ProfilDate = {
   full_name: string | null;
@@ -12,7 +13,6 @@ type ProfilDate = {
 };
 
 export default function ProfilPage() {
-  const supabase = createClient();
 
   const [profil, setProfil] = useState<ProfilDate | null>(null);
   const [incarcare, setIncarcare] = useState(true);
