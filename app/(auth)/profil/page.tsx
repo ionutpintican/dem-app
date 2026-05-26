@@ -211,8 +211,8 @@ export default function ProfilPage() {
         {!esteAdmin && (
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center">
-                <svg className="w-4 h-4 text-green-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center">
+                <svg className="w-4 h-4 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
@@ -233,7 +233,7 @@ export default function ProfilPage() {
                   value={rolNou}
                   onChange={(e) => { setRolNou(e.target.value); setStareRol("idle"); }}
                   disabled={stareRol === "loading"}
-                  className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 transition-colors disabled:opacity-60"
+                  className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-rose-400 transition-colors disabled:opacity-60"
                 >
                   {ROLURI_MEDICALE.map((r) => (
                     <option key={r.valoare} value={r.valoare}>{r.eticheta}</option>
@@ -247,7 +247,7 @@ export default function ProfilPage() {
                 </div>
               )}
               {stareRol === "succes" && (
-                <div className="rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700">
+                <div className="rounded-lg bg-rose-50 border border-rose-200 px-4 py-3 text-sm text-rose-400">
                   Specializarea a fost actualizată cu succes.
                 </div>
               )}
@@ -255,7 +255,7 @@ export default function ProfilPage() {
               <button
                 type="submit"
                 disabled={stareRol === "loading" || rolNou === profil?.role}
-                className="px-5 py-2.5 bg-green-700 text-white rounded-lg text-sm font-semibold hover:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2"
+                className="px-5 py-2.5 bg-rose-400 text-white rounded-lg text-sm font-semibold hover:bg-rose-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-rose-400 focus:ring-offset-2"
               >
                 {stareRol === "loading" ? (
                   <span className="flex items-center gap-2">
@@ -299,7 +299,7 @@ export default function ProfilPage() {
                 value={parolaVeche}
                 onChange={(e) => { setParolaVeche(e.target.value); setStareParola("idle"); }}
                 disabled={stareParola === "loading"}
-                className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 transition-colors disabled:opacity-60"
+                className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-rose-400 transition-colors disabled:opacity-60"
                 placeholder="••••••••"
               />
             </div>
@@ -316,7 +316,7 @@ export default function ProfilPage() {
                 value={parolaNoua}
                 onChange={(e) => { setParolaNoua(e.target.value); setStareParola("idle"); }}
                 disabled={stareParola === "loading"}
-                className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 transition-colors disabled:opacity-60"
+                className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-rose-400 transition-colors disabled:opacity-60"
                 placeholder="Minim 8 caractere"
               />
             </div>
@@ -333,7 +333,7 @@ export default function ProfilPage() {
                 value={confirmaParola}
                 onChange={(e) => { setConfirmaParola(e.target.value); setStareParola("idle"); }}
                 disabled={stareParola === "loading"}
-                className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 transition-colors disabled:opacity-60"
+                className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-rose-400 transition-colors disabled:opacity-60"
                 placeholder="••••••••"
               />
             </div>
@@ -344,7 +344,7 @@ export default function ProfilPage() {
               </div>
             )}
             {stareParola === "succes" && (
-              <div className="rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700">
+              <div className="rounded-lg bg-rose-50 border border-rose-200 px-4 py-3 text-sm text-rose-400">
                 Parola a fost schimbată cu succes.
               </div>
             )}

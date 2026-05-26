@@ -104,8 +104,8 @@ export default async function DashboardPage() {
               className="flex items-center gap-2.5 px-3 py-2 rounded-lg border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-colors"
               title="Profilul meu"
             >
-              <div className="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                <svg className="w-4 h-4 text-green-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="w-7 h-7 rounded-full bg-rose-100 flex items-center justify-center flex-shrink-0">
+                <svg className="w-4 h-4 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
@@ -155,7 +155,7 @@ export default async function DashboardPage() {
         {/* Statistici */}
         <div className="grid grid-cols-3 gap-4 mb-8">
           {[
-            { eticheta: "Cazuri noi", valoare: nrNou, culoare: "text-green-700" },
+            { eticheta: "Cazuri noi", valoare: nrNou, culoare: "text-rose-400" },
             { eticheta: "În lucru", valoare: nrInLucru, culoare: "text-amber-600" },
             { eticheta: "Finalizate", valoare: nrFinalizate, culoare: "text-green-600" },
           ].map((card) => (

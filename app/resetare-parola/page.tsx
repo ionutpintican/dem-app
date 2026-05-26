@@ -46,7 +46,7 @@ export default function ResetareParolaPage() {
 
           {stare === "trimis" ? (
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-green-100 mb-5">
+              <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-rose-100 mb-5">
                 <svg className="w-7 h-7 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                     d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -62,7 +62,7 @@ export default function ResetareParolaPage() {
               </p>
               <Link
                 href="/autentificare"
-                className="text-sm font-medium text-green-700 hover:text-green-800 transition-colors"
+                className="text-sm font-medium text-rose-400 hover:text-rose-500 transition-colors"
               >
                 ← Înapoi la autentificare
               </Link>
@@ -88,7 +88,7 @@ export default function ResetareParolaPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="doctor@spital.ro"
                     disabled={stare === "loading"}
-                    className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 transition-colors disabled:opacity-60"
+                    className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-rose-400 transition-colors disabled:opacity-60"
                   />
                 </div>
 
@@ -101,7 +101,7 @@ export default function ResetareParolaPage() {
                 <button
                   type="submit"
                   disabled={stare === "loading" || !email.trim()}
-                  className="w-full py-2.5 bg-green-700 text-white rounded-lg font-semibold hover:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2"
+                  className="w-full py-2.5 bg-rose-400 text-white rounded-lg font-semibold hover:bg-rose-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-rose-400 focus:ring-offset-2"
                 >
                   {stare === "loading" ? (
                     <span className="flex items-center justify-center gap-2">
@@ -122,7 +122,7 @@ export default function ResetareParolaPage() {
 
         {stare !== "trimis" && (
           <p className="text-center text-sm text-slate-500 mt-6">
-            <Link href="/autentificare" className="text-green-700 hover:text-green-800 font-medium transition-colors">
+            <Link href="/autentificare" className="text-rose-400 hover:text-rose-500 font-medium transition-colors">
               ← Înapoi la autentificare
             </Link>
           </p>

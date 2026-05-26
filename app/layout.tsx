@@ -15,8 +15,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Decizia Oncologică — IOCN Cluj-Napoca",
-  description: "Platformă pentru deciziile echipei multidisciplinare a Institutului Oncologic Prof. Dr. Ion Chiricuță Cluj-Napoca",
+  title: "Decizia Oncologică",
+  description: "Platformă pentru deciziile echipei medicale multidisciplinare",
 };
 
 export default function RootLayout({

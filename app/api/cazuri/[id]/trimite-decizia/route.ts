@@ -187,13 +187,12 @@ function emailDecizieFinala({
 
         <!-- Header -->
         <tr>
-          <td style="background:#15803d;padding:32px;text-align:center;">
+          <td style="background:#f43f5e;padding:32px;text-align:center;">
             <div style="display:inline-block;background:rgba(255,255,255,0.18);border-radius:12px;padding:10px 24px;margin-bottom:12px;">
               <span style="color:#ffffff;font-size:18px;font-weight:700;letter-spacing:0.5px;">Decizia Oncologică</span>
             </div>
-            <p style="color:#bbf7d0;margin:0;font-size:12px;letter-spacing:1px;line-height:1.6;">
-              DECIZIA ECHIPEI MULTIDISCIPLINARE<br>
-              <span style="font-size:11px;opacity:0.9;">Institutul Oncologic „Prof. Dr. Ion Chiricuță" Cluj-Napoca</span>
+            <p style="color:#fce7f3;margin:0;font-size:12px;letter-spacing:1px;line-height:1.6;">
+              DECIZIA ECHIPEI MULTIDISCIPLINARE
             </p>
           </td>
         </tr>
@@ -211,11 +210,11 @@ function emailDecizieFinala({
             </p>
 
             <!-- ID caz -->
-            <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;
+            <div style="background:#fdf2f8;border:1px solid #fce7f3;border-radius:10px;
               padding:12px 16px;margin-bottom:24px;display:flex;align-items:center;gap:12px;">
-              <span style="font-size:11px;font-weight:600;color:#15803d;text-transform:uppercase;
+              <span style="font-size:11px;font-weight:600;color:#f43f5e;text-transform:uppercase;
                 letter-spacing:1px;">ID dosar:</span>
-              <span style="font-size:15px;font-weight:700;color:#14532d;
+              <span style="font-size:15px;font-weight:700;color:#9f1239;
                 font-family:monospace;letter-spacing:2px;">${idScurt}</span>
             </div>
           </td>
@@ -224,12 +223,12 @@ function emailDecizieFinala({
         <!-- Decizia finală -->
         <tr>
           <td style="padding:0 32px 24px;">
-            <div style="background:#f0fdf4;border:2px solid #bbf7d0;border-radius:12px;padding:20px 24px;">
-              <p style="margin:0 0 10px;font-size:11px;font-weight:700;color:#16a34a;
+            <div style="background:#fdf2f8;border:2px solid #fce7f3;border-radius:12px;padding:20px 24px;">
+              <p style="margin:0 0 10px;font-size:11px;font-weight:700;color:#f43f5e;
                 text-transform:uppercase;letter-spacing:1px;">
                 ✓ Decizia echipei
               </p>
-              <p style="margin:0;font-size:15px;color:#14532d;line-height:1.8;white-space:pre-wrap;">${escapeHtml(decizieFinala)}</p>
+              <p style="margin:0;font-size:15px;color:#9f1239;line-height:1.8;white-space:pre-wrap;">${escapeHtml(decizieFinala)}</p>
             </div>
           </td>
         </tr>
@@ -278,7 +277,7 @@ function emailDecizieFinala({
         <tr>
           <td style="padding:20px 32px;background:#f8fafc;border-top:1px solid #e2e8f0;text-align:center;">
             <p style="margin:0;color:#94a3b8;font-size:11px;line-height:1.8;">
-              Acest document a fost generat automat de platforma Decizia Oncologică (IOCN Cluj-Napoca).<br>
+              Acest document a fost generat automat de platforma Decizia Oncologică.<br>
               Datele dumneavoastră sunt protejate conform
               <strong>Regulamentului UE 679/2016 (GDPR)</strong>.<br>
               Vă rugăm să nu răspundeți la acest mesaj.

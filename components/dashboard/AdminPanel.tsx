@@ -45,8 +45,8 @@ function Toggle({
       type="button"
       onClick={onToggle}
       disabled={disabled}
-      className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-1 disabled:opacity-40 disabled:cursor-not-allowed ${
-        activ ? "bg-green-700" : "bg-slate-300"
+      className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-rose-400 focus:ring-offset-1 disabled:opacity-40 disabled:cursor-not-allowed ${
+        activ ? "bg-rose-400" : "bg-slate-300"
       }`}
     >
       <span
@@ -136,7 +136,7 @@ function ModalContNou({
               value={campuri.full_name}
               onChange={(e) => schimba("full_name", e.target.value)}
               placeholder="Dr. Ion Popescu"
-              className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-300 transition-colors"
+              className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-300 transition-colors"
             />
           </div>
 
@@ -150,7 +150,7 @@ function ModalContNou({
               value={campuri.email}
               onChange={(e) => schimba("email", e.target.value)}
               placeholder="doctor@spital.ro"
-              className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-300 transition-colors"
+              className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-300 transition-colors"
             />
           </div>
 
@@ -162,7 +162,7 @@ function ModalContNou({
             <select
               value={campuri.role}
               onChange={(e) => schimba("role", e.target.value)}
-              className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-green-300 transition-colors bg-white"
+              className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-rose-300 transition-colors bg-white"
             >
               <option value="">— Selectează rolul —</option>
               {ROLURI_MEDICALE.map((r) => (
@@ -224,7 +224,7 @@ function ModalContNou({
             <button
               type="submit"
               disabled={pending}
-              className="flex-1 py-2.5 rounded-lg bg-green-700 text-white font-semibold hover:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex-1 py-2.5 rounded-lg bg-rose-400 text-white font-semibold hover:bg-rose-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {pending ? "Se creează..." : "Creează contul"}
             </button>
@@ -290,7 +290,7 @@ function ModalEditareCont({
               type="text"
               value={campuri.full_name}
               onChange={(e) => setCampuri((p) => ({ ...p, full_name: e.target.value }))}
-              className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-green-300 transition-colors"
+              className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-rose-300 transition-colors"
             />
           </div>
 
@@ -302,7 +302,7 @@ function ModalEditareCont({
               type="email"
               value={campuri.email}
               onChange={(e) => setCampuri((p) => ({ ...p, email: e.target.value }))}
-              className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-green-300 transition-colors"
+              className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-rose-300 transition-colors"
             />
           </div>
 
@@ -313,7 +313,7 @@ function ModalEditareCont({
             <select
               value={campuri.role}
               onChange={(e) => setCampuri((p) => ({ ...p, role: e.target.value }))}
-              className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-green-300 transition-colors bg-white"
+              className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-rose-300 transition-colors bg-white"
             >
               {ROLURI_MEDICALE.map((r) => (
                 <option key={r.valoare} value={r.valoare}>
@@ -340,7 +340,7 @@ function ModalEditareCont({
             <button
               type="submit"
               disabled={pending}
-              className="flex-1 py-2.5 rounded-lg bg-green-700 text-white font-semibold hover:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex-1 py-2.5 rounded-lg bg-rose-400 text-white font-semibold hover:bg-rose-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {pending ? "Se salvează..." : "Salvează"}
             </button>
@@ -559,12 +559,12 @@ export default function AdminPanel({
           placeholder="Caută după nume sau email..."
           value={cautare}
           onChange={(e) => setCautare(e.target.value)}
-          className="flex-1 px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-300 text-sm"
+          className="flex-1 px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-300 text-sm"
         />
         <select
           value={filtruRol}
           onChange={(e) => setFiltruRol(e.target.value)}
-          className="px-4 py-2.5 rounded-lg border border-slate-300 text-slate-700 focus:outline-none focus:ring-2 focus:ring-green-300 text-sm bg-white"
+          className="px-4 py-2.5 rounded-lg border border-slate-300 text-slate-700 focus:outline-none focus:ring-2 focus:ring-rose-300 text-sm bg-white"
         >
           <option value="">Toate rolurile</option>
           {ROLURI_MEDICALE.map((r) => (
@@ -573,7 +573,7 @@ export default function AdminPanel({
         </select>
         <button
           onClick={() => setAfiseazaModalNou(true)}
-          className="flex items-center gap-2 px-5 py-2.5 bg-green-700 text-white rounded-lg font-semibold hover:bg-green-800 transition-colors text-sm shrink-0"
+          className="flex items-center gap-2 px-5 py-2.5 bg-rose-400 text-white rounded-lg font-semibold hover:bg-rose-500 transition-colors text-sm shrink-0"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -643,7 +643,7 @@ export default function AdminPanel({
                       <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={() => setUtilizatorDeEditat(u)}
-                          className="text-xs font-medium text-slate-600 hover:text-green-700 transition-colors px-3 py-1.5 rounded-lg hover:bg-green-50"
+                          className="text-xs font-medium text-slate-600 hover:text-rose-400 transition-colors px-3 py-1.5 rounded-lg hover:bg-rose-50"
                         >
                           Editează
                         </button>

@@ -248,9 +248,9 @@ export default async function CazPage({ params }: { params: { id: string } }) {
                           href={f.downloadUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-3 p-2.5 rounded-lg border border-slate-200 hover:border-green-300 hover:bg-green-50 transition-colors group"
+                          className="flex items-center gap-3 p-2.5 rounded-lg border border-slate-200 hover:border-rose-300 hover:bg-rose-50 transition-colors group"
                         >
-                          <svg className="w-8 h-8 text-slate-300 group-hover:text-green-400 shrink-0 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <svg className="w-8 h-8 text-slate-300 group-hover:text-rose-400 shrink-0 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
                               d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                           </svg>
@@ -305,7 +305,7 @@ export default async function CazPage({ params }: { params: { id: string } }) {
                   const completat = roluriCompletate.has(rol);
                   return (
                     <div key={rol} className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium ${
-                      completat ? "bg-green-50 text-green-700" : "bg-slate-50 text-slate-400"
+                      completat ? "bg-rose-50 text-rose-400" : "bg-slate-50 text-slate-400"
                     }`}>
                       <span className={`w-2 h-2 rounded-full shrink-0 ${completat ? "bg-green-500" : "bg-slate-300"}`} />
                       {ETICHETA_ROL[rol] ?? rol}

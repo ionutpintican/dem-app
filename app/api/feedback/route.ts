@@ -60,9 +60,9 @@ export async function POST(request: NextRequest) {
         style="max-width:560px;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #e2e8f0;">
 
         <tr>
-          <td style="background:#15803d;padding:24px 32px;">
+          <td style="background:#f43f5e;padding:24px 32px;">
             <span style="color:#ffffff;font-size:16px;font-weight:700;letter-spacing:0.5px;">Decizia Oncologică</span>
-            <span style="color:#bbf7d0;font-size:13px;margin-left:12px;">· Feedback utilizator</span>
+            <span style="color:#fce7f3;font-size:13px;margin-left:12px;">· Feedback utilizator</span>
           </td>
         </tr>
 
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
         <tr>
           <td style="padding:16px 32px 24px;text-align:center;">
             <p style="margin:0;font-size:11px;color:#94a3b8;">
-              Trimis automat din platforma Decizia Oncologică (IOCN Cluj-Napoca)
+              Trimis automat din platforma Decizia Oncologică
             </p>
           </td>
         </tr>

@@ -51,7 +51,7 @@ function FormAutentificare() {
         </p>
 
         {parolaResetata && (
-          <div className="rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700 mb-5">
+          <div className="rounded-lg bg-rose-50 border border-rose-200 px-4 py-3 text-sm text-rose-400 mb-5">
             Parola a fost resetată cu succes. Te poți autentifica cu parola nouă.
           </div>
         )}
@@ -84,7 +84,7 @@ function FormAutentificare() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="doctor@spital.ro"
-              className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 transition-colors"
+              className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-rose-400 transition-colors"
             />
           </div>
 
@@ -95,7 +95,7 @@ function FormAutentificare() {
               </label>
               <Link
                 href="/resetare-parola"
-                className="text-xs text-green-700 hover:text-green-800 transition-colors"
+                className="text-xs text-rose-400 hover:text-rose-500 transition-colors"
               >
                 Ai uitat parola?
               </Link>
@@ -108,7 +108,7 @@ function FormAutentificare() {
               value={parola}
               onChange={(e) => setParola(e.target.value)}
               placeholder="••••••••"
-              className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400 transition-colors"
+              className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-rose-400 transition-colors"
             />
           </div>
 
@@ -121,7 +121,7 @@ function FormAutentificare() {
           <button
             type="submit"
             disabled={loading || !email || !parola}
-            className="w-full py-2.5 bg-green-700 text-white rounded-lg font-semibold hover:bg-green-800 active:bg-green-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2"
+            className="w-full py-2.5 bg-rose-400 text-white rounded-lg font-semibold hover:bg-rose-500 active:bg-rose-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-rose-400 focus:ring-offset-2"
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">
@@ -157,16 +157,26 @@ function FormAutentificare() {
             </span>
           </div>
         </div>
-        <div className="mt-4">
+        <div className="mt-4 space-y-2">
           <Link
             href="/"
-            className="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl border-2 border-green-200 bg-green-50 text-green-800 font-semibold text-sm hover:bg-green-100 hover:border-green-300 transition-colors"
+            className="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl border-2 border-rose-200 bg-rose-50 text-rose-500 font-semibold text-sm hover:bg-rose-100 hover:border-rose-300 transition-colors"
           >
             <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
             Depune o cerere medicală
+          </Link>
+          <Link
+            href="/echipa"
+            className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl border border-slate-200 text-slate-500 text-sm hover:bg-slate-50 hover:text-slate-700 transition-colors"
+          >
+            <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            Cunoaște echipa medicală
           </Link>
         </div>
       </div>

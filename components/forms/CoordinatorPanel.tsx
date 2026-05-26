@@ -116,21 +116,21 @@ export default function CoordinatorPanel({
   // ─── Starea "deja trimis" ───────────────────────────────────────────────────
   if (cazStatus === "trimis") {
     return (
-      <div className="bg-green-50 rounded-xl border border-green-200 p-5 space-y-4">
+      <div className="bg-rose-50 rounded-xl border border-rose-200 p-5 space-y-4">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 rounded-full bg-rose-100 flex items-center justify-center shrink-0">
             <svg className="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
           <div>
-            <p className="text-sm font-semibold text-green-800">Decizia a fost trimisă pacientului</p>
+            <p className="text-sm font-semibold text-rose-500">Decizia a fost trimisă pacientului</p>
             <p className="text-xs text-green-600 mt-0.5">Email trimis la {patientEmail}</p>
           </div>
         </div>
 
         {concluzieExistenta?.decizie_finala && (
-          <div className="bg-white rounded-lg border border-green-200 p-4">
+          <div className="bg-white rounded-lg border border-rose-200 p-4">
             <p className="text-xs text-slate-400 mb-1">Decizia finală</p>
             <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">
               {concluzieExistenta.decizie_finala}
@@ -229,7 +229,7 @@ export default function CoordinatorPanel({
               )}
             </div>
             {stareFormular === "success" && (
-              <p className="mb-2 text-xs text-green-700 bg-green-50 px-3 py-1.5 rounded-lg font-medium">
+              <p className="mb-2 text-xs text-rose-400 bg-rose-50 px-3 py-1.5 rounded-lg font-medium">
                 Concluzia a fost salvată.
               </p>
             )}
@@ -317,7 +317,7 @@ export default function CoordinatorPanel({
             areConcluzieCompletata
               ? toateLipsa
                 ? "border-orange-200 bg-orange-50"
-                : "border-green-200 bg-green-50"
+                : "border-rose-200 bg-rose-50"
               : "border-slate-200 bg-slate-50"
           }`}>
 
@@ -327,7 +327,7 @@ export default function CoordinatorPanel({
                 <svg className="w-4 h-4 text-green-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                <p className="text-xs text-green-800 font-medium">
+                <p className="text-xs text-rose-500 font-medium">
                   Toți specialiștii obligatorii au completat evaluarea.
                 </p>
               </div>
@@ -376,7 +376,7 @@ export default function CoordinatorPanel({
             {/* Popup confirmare */}
             {(stareTriimitere === "confirmare" || stareTriimitere === "loading") ? (
               <div className={`bg-white rounded-lg border p-4 space-y-3 ${
-                toateLipsa ? "border-orange-300" : "border-green-200"
+                toateLipsa ? "border-orange-300" : "border-rose-200"
               }`}>
                 {toateLipsa ? (
                   // Confirmare cu avertisment — lipsesc specialiști
@@ -420,7 +420,7 @@ export default function CoordinatorPanel({
                     className={`flex-1 px-4 py-2 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
                       toateLipsa
                         ? "bg-orange-600 hover:bg-orange-700"
-                        : "bg-green-700 hover:bg-green-800"
+                        : "bg-rose-400 hover:bg-rose-500"
                     }`}
                   >
                     {stareTriimitere === "loading" ? "Se trimite..." : "Da, trimite decizia"}
@@ -443,7 +443,7 @@ export default function CoordinatorPanel({
                   areConcluzieCompletata
                     ? toateLipsa
                       ? "bg-orange-500 text-white hover:bg-orange-600 cursor-pointer"
-                      : "bg-green-700 text-white hover:bg-green-800 cursor-pointer"
+                      : "bg-rose-400 text-white hover:bg-rose-500 cursor-pointer"
                     : "bg-slate-200 text-slate-400 cursor-not-allowed"
                 }`}
               >

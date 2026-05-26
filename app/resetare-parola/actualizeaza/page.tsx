@@ -54,7 +54,7 @@ export default function ActualizeazaParolaPage() {
       <main className="min-h-screen flex items-center justify-center px-4 py-10">
         <div className="w-full max-w-md">
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-green-100 mb-5">
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-rose-100 mb-5">
               <svg className="w-7 h-7 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
@@ -99,7 +99,7 @@ export default function ActualizeazaParolaPage() {
                 className={`w-full px-4 py-2.5 rounded-lg border text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 transition-colors disabled:opacity-60 ${
                   parolaScurta
                     ? "border-red-300 focus:ring-red-300"
-                    : "border-slate-300 focus:ring-green-300 focus:border-green-400"
+                    : "border-slate-300 focus:ring-rose-300 focus:border-rose-400"
                 }`}
               />
               {parolaScurta && (
@@ -123,7 +123,7 @@ export default function ActualizeazaParolaPage() {
                 className={`w-full px-4 py-2.5 rounded-lg border text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 transition-colors disabled:opacity-60 ${
                   parolaNepotrivita
                     ? "border-red-300 focus:ring-red-300"
-                    : "border-slate-300 focus:ring-green-300 focus:border-green-400"
+                    : "border-slate-300 focus:ring-rose-300 focus:border-rose-400"
                 }`}
               />
               {parolaNepotrivita && (
@@ -140,7 +140,7 @@ export default function ActualizeazaParolaPage() {
             <button
               type="submit"
               disabled={stare === "loading" || !parola || !confirmare || parolaNepotrivita || parolaScurta}
-              className="w-full py-2.5 bg-green-700 text-white rounded-lg font-semibold hover:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2"
+              className="w-full py-2.5 bg-rose-400 text-white rounded-lg font-semibold hover:bg-rose-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-rose-400 focus:ring-offset-2"
             >
               {stare === "loading" ? (
                 <span className="flex items-center justify-center gap-2">

@@ -41,7 +41,7 @@ function BaraProgres({ completati }: { completati: number }) {
       <div className="flex-1 bg-slate-100 rounded-full h-1.5 overflow-hidden">
         <div
           className={`h-full rounded-full transition-all ${
-            completati === TOTAL_OBLIGATORII ? "bg-green-500" : "bg-green-400"
+            completati === TOTAL_OBLIGATORII ? "bg-green-500" : "bg-rose-400"
           }`}
           style={{ width: `${procent}%` }}
         />
@@ -198,13 +198,13 @@ export default function CasesList({
             placeholder="Caută după pacient..."
             value={cautare}
             onChange={(e) => setCautare(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-300 text-sm"
+            className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-300 text-sm"
           />
         </div>
         <select
           value={filtruStatus}
           onChange={(e) => setFiltruStatus(e.target.value)}
-          className="px-4 py-2.5 rounded-lg border border-slate-300 text-slate-700 focus:outline-none focus:ring-2 focus:ring-green-300 text-sm bg-white"
+          className="px-4 py-2.5 rounded-lg border border-slate-300 text-slate-700 focus:outline-none focus:ring-2 focus:ring-rose-300 text-sm bg-white"
         >
           <option value="">Toate statusurile</option>
           {Object.entries(STATUS_CONFIG).map(([val, cfg]) => (
@@ -259,7 +259,7 @@ export default function CasesList({
                       <div className="flex items-center justify-end gap-2">
                         <Link
                           href={`/caz/${caz.id}`}
-                          className="text-xs font-medium text-green-700 hover:text-green-800 px-3 py-1.5 rounded-lg hover:bg-green-50 transition-colors"
+                          className="text-xs font-medium text-rose-400 hover:text-rose-500 px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors"
                         >
                           Deschide →
                         </Link>

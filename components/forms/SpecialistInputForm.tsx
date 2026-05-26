@@ -62,7 +62,7 @@ export default function SpecialistInputForm({ cazId, rol, cazStatus, inputExiste
   // Vizualizare read-only (după salvare sau dacă există deja)
   if (inputExistent && !editeaza) {
     return (
-      <div className="bg-white rounded-xl shadow-sm border border-green-200 p-5">
+      <div className="bg-white rounded-xl shadow-sm border border-rose-200 p-5">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-semibold text-slate-700 uppercase tracking-wide">
             Evaluarea mea — {etichetaRol}
@@ -70,7 +70,7 @@ export default function SpecialistInputForm({ cazId, rol, cazStatus, inputExiste
           {!esteFinalizat && (
             <button
               onClick={() => setEditeaza(true)}
-              className="text-xs font-medium text-green-700 hover:text-green-800 px-3 py-1.5 rounded-lg hover:bg-green-50 transition-colors"
+              className="text-xs font-medium text-rose-400 hover:text-rose-500 px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors"
             >
               Editează
             </button>
@@ -83,7 +83,7 @@ export default function SpecialistInputForm({ cazId, rol, cazStatus, inputExiste
         )}
 
         {stare === "success" && (
-          <p className="mb-3 text-xs text-green-700 bg-green-50 px-3 py-2 rounded-lg font-medium">
+          <p className="mb-3 text-xs text-rose-400 bg-rose-50 px-3 py-2 rounded-lg font-medium">
             Evaluarea a fost salvată cu succes.
           </p>
         )}
@@ -107,7 +107,7 @@ export default function SpecialistInputForm({ cazId, rol, cazStatus, inputExiste
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-green-200 p-5">
+    <div className="bg-white rounded-xl shadow-sm border border-rose-200 p-5">
       <div className="flex items-center justify-between mb-5">
         <h2 className="text-sm font-semibold text-slate-700 uppercase tracking-wide">
           {inputExistent ? "Editează evaluarea mea" : "Adaugă evaluarea mea"} — {etichetaRol}
@@ -139,7 +139,7 @@ export default function SpecialistInputForm({ cazId, rol, cazStatus, inputExiste
                 placeholder={camp.placeholder}
                 rows={3}
                 required={camp.obligatoriu}
-                className="w-full px-3 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-300 text-sm resize-none"
+                className="w-full px-3 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-300 text-sm resize-none"
               />
             ) : (
               <input
@@ -150,7 +150,7 @@ export default function SpecialistInputForm({ cazId, rol, cazStatus, inputExiste
                 }
                 placeholder={camp.placeholder}
                 required={camp.obligatoriu}
-                className="w-full px-3 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-300 text-sm"
+                className="w-full px-3 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-300 text-sm"
               />
             )}
           </div>
@@ -167,7 +167,7 @@ export default function SpecialistInputForm({ cazId, rol, cazStatus, inputExiste
           <button
             type="submit"
             disabled={stare === "loading"}
-            className="px-5 py-2.5 bg-green-700 text-white text-sm font-medium rounded-lg hover:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-5 py-2.5 bg-rose-400 text-white text-sm font-medium rounded-lg hover:bg-rose-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {stare === "loading" ? "Se salvează..." : "Salvează evaluarea"}
           </button>
