@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 
 type Props = {
   numeUtilizator: string;
@@ -12,7 +13,10 @@ export default function FeedbackModal({ numeUtilizator, rolUtilizator }: Props) 
   const [mesaj, setMesaj] = useState("");
   const [stare, setStare] = useState<"idle" | "loading" | "trimis" | "eroare">("idle");
   const [eroare, setEroare] = useState("");
+  const [montat, setMontat] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => { setMontat(true); }, []);
 
   useEffect(() => {
     if (deschis && textareaRef.current) {
@@ -80,8 +84,8 @@ export default function FeedbackModal({ numeUtilizator, rolUtilizator }: Props) 
         <span className="hidden sm:inline">Sugerează îmbunătățiri</span>
       </button>
 
-      {/* Modal overlay */}
-      {deschis && (
+      {/* Modal overlay — renderat prin portal ca să iasă de sub backdrop-filter-ul header-ului */}
+      {deschis && montat && createPortal(
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
           onClick={(e) => { if (e.target === e.currentTarget) inchide(); }}
@@ -217,7 +221,8 @@ export default function FeedbackModal({ numeUtilizator, rolUtilizator }: Props) 
               </form>
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
