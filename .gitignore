@@ -35,5 +35,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# documentatie interna (fisiere Word, PDF)
-/docs
+# documentatie interna (fisiere Word, PDF) — exceptam spec-urile SDD
+/docs/*
+!/docs/specs/
