@@ -129,9 +129,24 @@ export async function DELETE(
     .update({ is_active: false, is_coordinator: false } as never)
     .eq("id", id);
 
-  // Pas 2: ștergere din auth (reușește dacă doctorul nu are contribuții; altfel eșuează silențios)
-  // FK RESTRICT pe specialist_inputs împiedică ștergerea dacă există contribuții — soft delete e suficient
-  await service.auth.admin.deleteUser(id).catch(() => null);
+  // Pas 2: ștergere din auth
+  // Dacă doctorul are contribuții în specialist_inputs (FK RESTRICT), cascade-ul eșuează.
+  // În acel caz anonimizăm email-ul pentru a elibera adresa originală și a marca
+  // contul ca șters definitiv (astfel nu va mai apărea în lista de useri).
+  const { error: authDeleteError } = await service.auth.admin.deleteUser(id);
+  if (authDeleteError) {
+    const emailAnonimat = `deleted_${id}@deleted.invalid`;
+    const { error: updateEmailError } = await service.auth.admin.updateUserById(id, {
+      email: emailAnonimat,
+    });
+    if (!updateEmailError) {
+      // Sincronizăm email-ul și în profilul public
+      await service
+        .from("users")
+        .update({ email: emailAnonimat } as never)
+        .eq("id", id);
+    }
+  }
 
   // Audit
   try {

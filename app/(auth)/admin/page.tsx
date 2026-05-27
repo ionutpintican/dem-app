@@ -26,6 +26,8 @@ export default async function AdminPage() {
   const { data: utilizatori } = await service
     .from("users")
     .select("id, full_name, email, role, is_coordinator, is_active, created_at")
+    // Excludem conturile marcate ca șterse definitiv (email anonimizat după eșec FK RESTRICT)
+    .not("email", "ilike", "%@deleted.invalid")
     .order("created_at", { ascending: false }) as unknown as {
       data: Utilizator[] | null;
       error: unknown;
