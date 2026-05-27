@@ -59,12 +59,6 @@ export const ECHIPA: Doctor[] = [
     imgUrl: "https://ctm.iocn.ro/wp-content/uploads/2024/10/dr-pintican-roxana.png",
     categorie: "radiologie",
   },
-  {
-    nume: "Dr. Alexandra Andries",
-    specialitate: "Medic specialist radiologie și imagistică medicală",
-    imgUrl: "https://ctm.iocn.ro/wp-content/uploads/2023/01/dr-Alexandra-Andries_ctm.jpg",
-    categorie: "radiologie",
-  },
 
   // Oncologie medicală
   {
@@ -75,21 +69,9 @@ export const ECHIPA: Doctor[] = [
     esteCoordonator: true,
   },
   {
-    nume: "Dr. Gabriela Morar-Bolba",
-    specialitate: "Medic primar oncologie medicală",
-    imgUrl: "https://ctm.iocn.ro/wp-content/uploads/2022/11/Gabriela-Morar-Bolba-scaled.jpeg",
-    categorie: "oncologie",
-  },
-  {
     nume: "Dr. Rohozneanu Emanuela",
     specialitate: "Medic oncologie medicală",
     imgUrl: "https://ctm.iocn.ro/wp-content/uploads/2024/10/dr_rohozneanu_emanuela_2.png",
-    categorie: "oncologie",
-  },
-  {
-    nume: "Dr. Daniela Grecea",
-    specialitate: "Medic primar radioterapie și oncologie medicală",
-    imgUrl: "https://ctm.iocn.ro/wp-content/uploads/2022/12/Daniela-Grecea2-600x1065.jpg",
     categorie: "oncologie",
   },
   {
@@ -109,21 +91,6 @@ export const ECHIPA: Doctor[] = [
     specialitate: "Medic oncologie medicală",
     imgUrl: "https://ctm.iocn.ro/wp-content/uploads/2025/10/Dr.-Alecsandra-Gorzo.jpg",
     categorie: "oncologie",
-  },
-
-  // Chirurgie oncologică
-  {
-    nume: "Conf. Dr. Lisencu Cosmin",
-    specialitate: "Medic primar chirurgie oncologică",
-    imgUrl: null,
-    categorie: "chirurgie_oncologica",
-    esteCoordonator: true,
-  },
-  {
-    nume: "Dr. Pușcaș Marius Emil",
-    specialitate: "Medic chirurgie oncologică",
-    imgUrl: null,
-    categorie: "chirurgie_oncologica",
   },
 
   // Chirurgie plastică și reconstructivă
@@ -176,12 +143,6 @@ export const ECHIPA: Doctor[] = [
   },
 
   // Psiho-oncologie
-  {
-    nume: "Psh. Florina Pop",
-    specialitate: "Psiholog clinician, psiho-oncologie",
-    imgUrl: "https://ctm.iocn.ro/wp-content/uploads/2024/10/dr-florina-pop.png",
-    categorie: "psihologie",
-  },
   {
     nume: "Psh. Nicoleta Pașca",
     specialitate: "Psiholog clinician, psihoterapeut",
