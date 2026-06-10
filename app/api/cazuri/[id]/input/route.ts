@@ -31,6 +31,13 @@ export async function POST(
     return NextResponse.json({ error: "Evaluarea este prea lungă (max ~50 KB)" }, { status: 422 });
   }
 
+  // Optimistic concurrency: string = versiunea pe care clientul a editat-o,
+  // null/absent = salvare forțată (suprascrie indiferent de versiune)
+  const expectedUpdatedAt = (body as { expected_updated_at?: unknown }).expected_updated_at;
+  if (expectedUpdatedAt !== undefined && expectedUpdatedAt !== null && typeof expectedUpdatedAt !== "string") {
+    return NextResponse.json({ error: "expected_updated_at invalid" }, { status: 422 });
+  }
+
   const service = createServiceClient();
 
   // Preia profilul utilizatorului
@@ -71,17 +78,36 @@ export async function POST(
   // Caută input existent al acestui user pentru acest caz (exclusiv concluzia de coordonator)
   const { data: inputExistent } = await service
     .from("specialist_inputs")
-    .select("id")
+    .select("id, updated_at, content")
     .eq("case_id", cazId)
     .eq("user_id", user.id)
     .eq("is_coordinator_conclusion", false)
     .single() as unknown as {
-      data: { id: string } | null;
+      data: { id: string; updated_at: string; content: Record<string, unknown> } | null;
       error: unknown;
     };
 
+  // Conflict: clientul a editat o versiune mai veche decât cea din DB
+  if (
+    inputExistent &&
+    typeof expectedUpdatedAt === "string" &&
+    inputExistent.updated_at !== expectedUpdatedAt
+  ) {
+    return NextResponse.json(
+      {
+        error: "Evaluarea a fost modificată între timp (în alt tab sau pe alt dispozitiv).",
+        code: "STALE_VERSION",
+        current_content: inputExistent.content,
+        current_updated_at: inputExistent.updated_at,
+      },
+      { status: 409 }
+    );
+  }
+
   let inputId: string;
   const esteActualizare = !!inputExistent;
+
+  let inputUpdatedAt: string;
 
   if (inputExistent) {
     // UPDATE
@@ -92,14 +118,15 @@ export async function POST(
         updated_at: new Date().toISOString(),
       } as never)
       .eq("id", inputExistent.id)
-      .select("id")
-      .single() as unknown as { data: { id: string } | null; error: unknown };
+      .select("id, updated_at")
+      .single() as unknown as { data: { id: string; updated_at: string } | null; error: unknown };
 
     if (error || !updated) {
       console.error("Eroare update input specialist:", error);
       return NextResponse.json({ error: "Eroare la salvarea evaluării" }, { status: 500 });
     }
     inputId = updated.id;
+    inputUpdatedAt = updated.updated_at;
   } else {
     // INSERT
     const { data: inserted, error } = await service
@@ -111,14 +138,15 @@ export async function POST(
         content: content as never,
         is_coordinator_conclusion: false,
       } as never)
-      .select("id")
-      .single() as unknown as { data: { id: string } | null; error: unknown };
+      .select("id, updated_at")
+      .single() as unknown as { data: { id: string; updated_at: string } | null; error: unknown };
 
     if (error || !inserted) {
       console.error("Eroare inserare input specialist:", error);
       return NextResponse.json({ error: "Eroare la salvarea evaluării" }, { status: 500 });
     }
     inputId = inserted.id;
+    inputUpdatedAt = inserted.updated_at;
   }
 
   // Tranziție status caz: nou → in_lucru
@@ -167,7 +195,7 @@ export async function POST(
   } catch { /* ignorăm */ }
 
   return NextResponse.json(
-    { success: true, inputId },
+    { success: true, inputId, updated_at: inputUpdatedAt },
     { status: esteActualizare ? 200 : 201 }
   );
 }

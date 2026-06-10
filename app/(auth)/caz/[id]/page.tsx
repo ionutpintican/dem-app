@@ -7,18 +7,8 @@ import { STATUS_CONFIG, ROLURI_OBLIGATORII, TOTAL_OBLIGATORII } from "@/lib/cons
 import SpecialistInputForm from "@/components/forms/SpecialistInputForm";
 import CoordinatorPanel from "@/components/forms/CoordinatorPanel";
 import HeaderBrand from "@/components/layout/HeaderBrand";
-
-// Categoriile salvate de formularul public (CATEGORII_VALIDE din /api/cazuri/nou)
-const ETICHETA_CATEGORIE: Record<string, string> = {
-  ct: "CT",
-  rmn: "RMN",
-  ecografie: "Ecografie",
-  radiografie: "Radiografie",
-  biopsie: "Biopsie",
-  analize: "Analize",
-  scrisoare: "Scrisoare medicală",
-  altele: "Altele",
-};
+import FisiereCaz from "@/components/caz/FisiereCaz";
+import RevalidateOnFocus from "@/components/caz/RevalidateOnFocus";
 
 export default async function CazPage({ params }: { params: { id: string } }) {
   const supabase = await createClient();
@@ -63,32 +53,22 @@ export default async function CazPage({ params }: { params: { id: string } }) {
 
   if (!caz) notFound();
 
-  // Preia fișierele cu URL-uri semnate
+  // Preia fișierele — URL-urile semnate se generează on-demand la click
+  // (prin /api/cazuri/[id]/fisiere/[fileId]), ca download-ul să fie auditabil
   const { data: fisiere } = await service
     .from("case_files")
-    .select("id, file_name, file_path, file_size, category, created_at")
+    .select("id, file_name, file_size, category, created_at")
     .eq("case_id", id)
     .order("created_at", { ascending: true }) as unknown as {
       data: {
         id: string;
         file_name: string;
-        file_path: string;
         file_size: number | null;
         category: string;
         created_at: string;
       }[] | null;
       error: unknown;
     };
-
-  // Generează URL-uri semnate pentru download (valabile 1 oră)
-  const fisiereWithUrls = await Promise.all(
-    (fisiere ?? []).map(async (f) => {
-      const { data } = await service.storage
-        .from("medical-files")
-        .createSignedUrl(f.file_path, 3600);
-      return { ...f, downloadUrl: data?.signedUrl ?? null };
-    })
-  );
 
   // Preia inputurile specialiștilor
   const { data: inputuri } = await service
@@ -147,14 +127,9 @@ export default async function CazPage({ params }: { params: { id: string } }) {
     (r) => !roluriCompletate.has(r)
   );
 
-  function formatBytes(bytes: number | null) {
-    if (!bytes) return "";
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-  }
-
   return (
     <div className="min-h-screen">
+      <RevalidateOnFocus />
 
       {/* Header */}
       <header className="bg-white/90 backdrop-blur-sm border-b border-slate-200 shadow-sm">
@@ -242,45 +217,9 @@ export default async function CazPage({ params }: { params: { id: string } }) {
             {/* Fișiere */}
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
               <h2 className="text-sm font-semibold text-slate-700 mb-3 uppercase tracking-wide">
-                Documente ({fisiereWithUrls.length})
+                Documente ({(fisiere ?? []).length})
               </h2>
-              {fisiereWithUrls.length === 0 ? (
-                <p className="text-sm text-slate-400">Niciun fișier atașat.</p>
-              ) : (
-                <ul className="space-y-2">
-                  {fisiereWithUrls.map((f) => (
-                    <li key={f.id}>
-                      {f.downloadUrl ? (
-                        <a
-                          href={f.downloadUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-3 p-2.5 rounded-lg border border-slate-200 hover:border-rose-300 hover:bg-rose-50 transition-colors group"
-                        >
-                          <svg className="w-8 h-8 text-slate-300 group-hover:text-rose-400 shrink-0 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                          </svg>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-xs font-medium text-slate-700 truncate">{f.file_name}</p>
-                            <p className="text-xs text-slate-400">
-                              {ETICHETA_CATEGORIE[f.category] ?? f.category}
-                              {f.file_size ? ` · ${formatBytes(f.file_size)}` : ""}
-                            </p>
-                          </div>
-                          <svg className="w-4 h-4 text-slate-300 group-hover:text-green-500 shrink-0 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                          </svg>
-                        </a>
-                      ) : (
-                        <div className="flex items-center gap-3 p-2.5 rounded-lg border border-slate-200 opacity-50">
-                          <p className="text-xs text-slate-500 truncate">{f.file_name}</p>
-                        </div>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              )}
+              <FisiereCaz cazId={id} fisiere={fisiere ?? []} />
             </div>
           </div>
 
@@ -340,6 +279,7 @@ export default async function CazPage({ params }: { params: { id: string } }) {
                 rol={profil?.role ?? ""}
                 cazStatus={caz.status}
                 inputExistent={contentulMeu}
+                inputUpdatedAt={inputulMeu?.updated_at ?? null}
               />
             )}
 

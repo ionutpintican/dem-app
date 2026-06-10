@@ -1,8 +1,9 @@
 ﻿"use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ETICHETA_ROL } from "@/lib/roluri";
+import { useUnsavedGuard } from "@/lib/hooks/use-unsaved-guard";
 
 type Props = {
   cazId: string;
@@ -37,6 +38,22 @@ export default function CoordinatorPanel({
   const esteFinalizat = cazStatus === "trimis" || cazStatus === "arhivat";
   const areConcluzieCompletata = decizie.trim().length > 0;
   const toateLipsa = roluriLipsa.length > 0;
+
+  const baselineDecizie = concluzieExistenta?.decizie_finala ?? "";
+  const baselineRecomandari = concluzieExistenta?.recomandari ?? "";
+
+  // Resincronizare cu serverul (după router.refresh sau anulare) cât timp nu editezi
+  useEffect(() => {
+    if (!editeaza) {
+      setDecizie(baselineDecizie);
+      setRecomandari(baselineRecomandari);
+    }
+  }, [baselineDecizie, baselineRecomandari, editeaza]);
+
+  // Prompt nativ la închiderea tabului dacă concluzia are modificări nesalvate
+  const areModificari =
+    editeaza && (decizie !== baselineDecizie || recomandari !== baselineRecomandari);
+  useUnsavedGuard(areModificari);
 
   // ─── Salvare concluzie ──────────────────────────────────────────────────────
   async function salveazaConcluzia(e: React.FormEvent) {

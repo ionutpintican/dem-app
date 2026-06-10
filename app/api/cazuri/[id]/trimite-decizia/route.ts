@@ -140,9 +140,11 @@ export async function POST(
 
   // Audit log
   try {
+    // "status_change" + notes — enum-ul audit_action din DB nu are "send_decision"
+    // (insert-ul eșua silențios); după migrarea 002 se poate trece pe valoarea dedicată
     await service.from("audit_logs").insert({
       user_id: user.id,
-      action: "send_decision",
+      action: "status_change",
       resource_type: "cases",
       resource_id: cazId,
       case_id: cazId,
