@@ -1,6 +1,6 @@
 # 009 — Pagina caz: prevenire conflicte la editare + preview imagini
 
-**Status:** Draft
+**Status:** Implemented — de verificat manual (build OK; migrarea 002 trebuie rulata manual in SQL Editor)
 **Prioritate:** Înaltă (afectează integritatea datelor medicale)
 **Effort:** L (~75 min)
 **Data:** 2026-05-28
