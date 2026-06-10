@@ -227,8 +227,10 @@ function emailConfirmarePacient({
   descriere: string;
 }) {
   const idScurt = cazId.slice(0, 8).toUpperCase();
-  const descrierePrescurtata =
-    descriere.length > 200 ? descriere.slice(0, 200) + "..." : descriere;
+  const descrierePrescurtata = escapeHtml(
+    descriere.length > 200 ? descriere.slice(0, 200) + "..." : descriere
+  );
+  const numePacientEscapat = escapeHtml(numePacient);
 
   return `
 <!DOCTYPE html>
@@ -252,7 +254,7 @@ function emailConfirmarePacient({
         <tr>
           <td style="padding:40px 32px;">
             <h1 style="margin:0 0 8px;font-size:22px;color:#0f172a;">Cererea ta a fost înregistrată</h1>
-            <p style="margin:0 0 24px;color:#64748b;font-size:15px;">Bună ziua, <strong>${numePacient}</strong>.</p>
+            <p style="margin:0 0 24px;color:#64748b;font-size:15px;">Bună ziua, <strong>${numePacientEscapat}</strong>.</p>
             <p style="margin:0 0 24px;color:#475569;font-size:15px;line-height:1.6;">
               Echipa medicală a primit cererea ta și o va analiza în cel mai scurt timp.
               Vei primi decizia echipei pe această adresă de email.
@@ -302,4 +304,12 @@ function emailConfirmarePacient({
   </table>
 </body>
 </html>`;
+}
+
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
