@@ -87,6 +87,23 @@ export async function POST(
 
   const inputuriSpecialisti = (inputuri ?? []).filter((i) => !i.is_coordinator_conclusion);
 
+  // Compare-and-swap ÎNAINTE de email: marchează cazul ca trimis doar dacă nu e
+  // deja trimis/arhivat. Blochează trimiterea dublă (dublu-click, două taburi).
+  const { data: cazBlocat } = await service
+    .from("cases")
+    .update({
+      status: "trimis",
+      decision_sent_at: new Date().toISOString(),
+      sent_by: user.id,
+    } as never)
+    .eq("id", cazId)
+    .not("status", "in", '("trimis","arhivat")')
+    .select("id") as unknown as { data: { id: string }[] | null; error: unknown };
+
+  if (!cazBlocat || cazBlocat.length === 0) {
+    return NextResponse.json({ error: "Decizia a fost deja trimisă" }, { status: 409 });
+  }
+
   // Trimite emailul
   try {
     await sendEmail({
@@ -106,21 +123,20 @@ export async function POST(
     });
   } catch (emailError) {
     console.error("Eroare trimitere email decizie:", emailError);
+    // Rollback compensator: emailul nu a plecat, restaurăm statusul anterior
+    await service
+      .from("cases")
+      .update({
+        status: caz.status,
+        decision_sent_at: null,
+        sent_by: null,
+      } as never)
+      .eq("id", cazId);
     return NextResponse.json(
       { error: "Eroare la trimiterea emailului. Încearcă din nou." },
       { status: 500 }
     );
   }
-
-  // Actualizează statusul cazului → trimis
-  await service
-    .from("cases")
-    .update({
-      status: "trimis",
-      decision_sent_at: new Date().toISOString(),
-      sent_by: user.id,
-    } as never)
-    .eq("id", cazId);
 
   // Audit log
   try {
@@ -164,7 +180,7 @@ function emailDecizieFinala({
         <span style="font-size:12px;font-weight:600;color:#475569;">${ETICHETA_ROL[rol] ?? rol}</span>
       </td>
       <td style="padding:10px 12px;border-bottom:1px solid #f1f5f9;vertical-align:top;">
-        <p style="margin:0;font-size:13px;color:#334155;line-height:1.6;">${concluzie || "—"}</p>
+        <p style="margin:0;font-size:13px;color:#334155;line-height:1.6;">${concluzie ? escapeHtml(concluzie) : "—"}</p>
       </td>
     </tr>`;
 
@@ -201,12 +217,12 @@ function emailDecizieFinala({
         <tr>
           <td style="padding:32px 32px 0;">
             <p style="margin:0 0 6px;font-size:18px;font-weight:700;color:#0f172a;">
-              Stimate/ă ${pacientName},
+              Stimate/ă ${escapeHtml(pacientName)},
             </p>
             <p style="margin:0 0 24px;font-size:14px;color:#64748b;line-height:1.7;">
               Echipa medicală multidisciplinară a finalizat evaluarea cazului dumneavoastră
               și vă transmite decizia colectivă. Documentul a fost elaborat de
-              <strong>${coordonatorName}</strong> în data de <strong>${dataTrimitere}</strong>.
+              <strong>${escapeHtml(coordonatorName)}</strong> în data de <strong>${dataTrimitere}</strong>.
             </p>
 
             <!-- ID caz -->
