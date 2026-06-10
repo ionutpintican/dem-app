@@ -1,6 +1,6 @@
 # 012 — Audit securitate & robustețe: acces, redirect, limite server, trimitere atomică
 
-**Status:** Draft
+**Status:** Implemented — de verificat manual (build ✓, test plan manual în așteptare)
 **Prioritate:** Critică (securitate + integritatea actului medical)
 **Effort:** L (~90 min cod) + follow-up DB
 **Data:** 2026-06-10
