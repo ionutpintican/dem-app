@@ -151,9 +151,10 @@ export async function DELETE(
   // Audit
   try {
     await service.from("audit_logs").insert({
+      user_id: admin.id,
       action: "delete",
-      table_name: "users",
-      record_id: id,
+      resource_type: "users",
+      resource_id: id,
       notes: `Cont șters de admin: ${tinta.full_name ?? id}`,
     } as never);
   } catch { /* non-blocking */ }

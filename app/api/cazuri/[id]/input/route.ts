@@ -27,6 +27,9 @@ export async function POST(
   if (!content || typeof content !== "object" || Array.isArray(content)) {
     return NextResponse.json({ error: "Câmpul content lipsește sau este invalid" }, { status: 422 });
   }
+  if (JSON.stringify(content).length > 50_000) {
+    return NextResponse.json({ error: "Evaluarea este prea lungă (max ~50 KB)" }, { status: 422 });
+  }
 
   const service = createServiceClient();
 

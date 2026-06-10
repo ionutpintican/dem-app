@@ -3,7 +3,8 @@ import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { sendEmail } from "@/lib/email/resend";
 import { ETICHETA_ROL } from "@/lib/roluri";
 
-const DEVELOPER_EMAIL = "ionut.pintican@gmail.com";
+const DEVELOPER_EMAIL = process.env.FEEDBACK_EMAIL ?? "ionut.pintican@gmail.com";
+const MAX_MESAJ_LUNGIME = 5000;
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
@@ -37,6 +38,12 @@ export async function POST(request: NextRequest) {
   const mesaj = (body as { mesaj?: unknown }).mesaj;
   if (!mesaj || typeof mesaj !== "string" || !mesaj.trim()) {
     return NextResponse.json({ error: "Mesajul este obligatoriu" }, { status: 422 });
+  }
+  if (mesaj.length > MAX_MESAJ_LUNGIME) {
+    return NextResponse.json(
+      { error: `Mesajul depășește ${MAX_MESAJ_LUNGIME} de caractere.` },
+      { status: 422 }
+    );
   }
 
   const numeExpeditor = profil.full_name ?? user.email ?? "Utilizator necunoscut";

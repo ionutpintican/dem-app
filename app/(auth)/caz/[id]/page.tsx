@@ -8,11 +8,15 @@ import SpecialistInputForm from "@/components/forms/SpecialistInputForm";
 import CoordinatorPanel from "@/components/forms/CoordinatorPanel";
 import HeaderBrand from "@/components/layout/HeaderBrand";
 
+// Categoriile salvate de formularul public (CATEGORII_VALIDE din /api/cazuri/nou)
 const ETICHETA_CATEGORIE: Record<string, string> = {
-  analiza: "Analiză",
-  imagistica: "Imagistică",
-  reteta: "Rețetă",
-  trimitere: "Trimitere",
+  ct: "CT",
+  rmn: "RMN",
+  ecografie: "Ecografie",
+  radiografie: "Radiografie",
+  biopsie: "Biopsie",
+  analize: "Analize",
+  scrisoare: "Scrisoare medicală",
   altele: "Altele",
 };
 

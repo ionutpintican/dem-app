@@ -13,12 +13,24 @@ function genereazaParola(): string {
     "23456789",
     "!@#$%",
   ];
-  let parola = seturi.map((s) => s[Math.floor(Math.random() * s.length)]).join("");
+  // crypto.getRandomValues — Math.random nu e potrivit pentru parole
+  const randomInt = (max: number) => {
+    const buf = new Uint32Array(1);
+    crypto.getRandomValues(buf);
+    return buf[0] % max;
+  };
+  let parola = seturi.map((s) => s[randomInt(s.length)]).join("");
   const toate = seturi.join("");
   for (let i = parola.length; i < 12; i++) {
-    parola += toate[Math.floor(Math.random() * toate.length)];
+    parola += toate[randomInt(toate.length)];
   }
-  return parola.split("").sort(() => Math.random() - 0.5).join("");
+  // Amestecă (Fisher–Yates) ca primele 4 caractere să nu fie predictibile pe seturi
+  const chars = parola.split("");
+  for (let i = chars.length - 1; i > 0; i--) {
+    const j = randomInt(i + 1);
+    [chars[i], chars[j]] = [chars[j], chars[i]];
+  }
+  return chars.join("");
 }
 
 // ─── Badge rol ────────────────────────────────────────────────────────────────

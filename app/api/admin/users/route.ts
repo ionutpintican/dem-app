@@ -56,6 +56,19 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Toate câmpurile sunt obligatorii" }, { status: 422 });
   }
 
+  // Aceleași reguli ca registerSchema: min 8 caractere, o majusculă, o cifră
+  if (
+    typeof parola_temporara !== "string" ||
+    parola_temporara.length < 8 ||
+    !/[A-Z]/.test(parola_temporara) ||
+    !/[0-9]/.test(parola_temporara)
+  ) {
+    return NextResponse.json(
+      { error: "Parola temporară trebuie să aibă minimum 8 caractere, o literă mare și o cifră." },
+      { status: 422 }
+    );
+  }
+
   const service = createServiceClient();
 
   // Creare cont în Supabase Auth
