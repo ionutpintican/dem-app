@@ -27,12 +27,15 @@ export default async function CazPage({ params }: { params: { id: string } }) {
   // Preia profilul utilizatorului curent
   const { data: profil } = await supabase
     .from("users")
-    .select("full_name, role, is_coordinator")
+    .select("full_name, role, is_coordinator, is_active")
     .eq("id", user.id)
     .single() as unknown as {
-      data: { full_name: string | null; role: string; is_coordinator: boolean } | null;
+      data: { full_name: string | null; role: string; is_coordinator: boolean; is_active: boolean } | null;
       error: unknown;
     };
+
+  // Defense-in-depth pe lângă middleware: cont dezactivat/șters nu vede fișe
+  if (!profil?.is_active) redirect("/autentificare?eroare=cont-dezactivat");
 
   // Preia cazul
   const { data: caz } = await service

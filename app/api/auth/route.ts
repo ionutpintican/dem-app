@@ -4,7 +4,9 @@ import { NextResponse } from "next/server";
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/dashboard";
+  const nextRaw = searchParams.get("next") ?? "/dashboard";
+  // Doar căi interne — blocăm open redirect (//evil.com, /\evil.com, https://...)
+  const next = /^\/(?![/\\])/.test(nextRaw) ? nextRaw : "/dashboard";
 
   if (code) {
     const supabase = await createClient();
