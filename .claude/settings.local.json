@@ -38,7 +38,12 @@
       "mcp__Claude_in_Chrome__read_page",
       "mcp__Claude_in_Chrome__resize_window",
       "PowerShell(New-Item -ItemType Directory -Force \"C:\\\\Users\\\\Roxana Pintican\\\\dem-app\\\\docs\\\\specs\")",
-      "WebFetch(domain:ctm.iocn.ro)"
+      "WebFetch(domain:ctm.iocn.ro)",
+      "Bash(git check-ignore *)",
+      "Bash(git commit -m 'SDD: adauga specurile 006-011 \\(draft\\) *)",
+      "Bash(git commit -m 'SDD: spec 012 - audit securitate si robustete *)",
+      "PowerShell(git add -A)",
+      "PowerShell(git push origin main)"
     ]
   }
 }

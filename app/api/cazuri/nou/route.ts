@@ -2,18 +2,45 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createServiceClient } from "@/lib/supabase/server";
 import { sendEmail } from "@/lib/email/resend";
+import { rateLimit, clientIp } from "@/lib/rate-limit";
 
 const schema = z.object({
-  nume: z.string().min(2),
-  prenume: z.string().min(2),
-  email: z.string().email(),
-  dataNasterii: z.string().min(1),
-  telefon: z.string().optional(),
-  descriere: z.string().min(20),
+  nume: z.string().min(2).max(100),
+  prenume: z.string().min(2).max(100),
+  email: z.string().email().max(254),
+  dataNasterii: z.string().min(1).max(10),
+  telefon: z.string().max(20).optional(),
+  descriere: z.string().min(20).max(5000),
   gdpr: z.string(),
 });
 
+// Limite upload server-side (clientul are propriile limite, dar nu e de încredere)
+const MAX_FISIERE = 20;
+const MAX_FISIER_BYTES = 10 * 1024 * 1024; // 10 MB
+const MAX_TOTAL_BYTES = 50 * 1024 * 1024; // 50 MB
+const MIME_PERMISE = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+]);
+
 export async function POST(request: Request) {
+  // Rate limiting per IP — endpoint public, fără autentificare
+  const { allowed, retryAfterSec } = rateLimit({
+    key: `cazuri-nou:${clientIp(request)}`,
+    limit: 5,
+    windowMs: 10 * 60 * 1000,
+  });
+  if (!allowed) {
+    return NextResponse.json(
+      { error: "Prea multe cereri. Încearcă din nou în câteva minute." },
+      { status: 429, headers: { "Retry-After": String(retryAfterSec) } }
+    );
+  }
+
   const formData = await request.formData();
 
   // ─── 1. Validare câmpuri ────────────────────────────────────────────────────
@@ -44,7 +71,36 @@ export async function POST(request: Request) {
 
   const { nume, prenume, email, dataNasterii, telefon, descriere } = result.data;
   const numePacient = `${prenume} ${nume}`;
-  const fisiere = formData.getAll("fisiere") as File[];
+  const fisiere = (formData.getAll("fisiere") as File[]).filter((f) => f.size > 0);
+
+  // ─── 1b. Validare fișiere server-side (înainte de a crea orice) ─────────────
+  if (fisiere.length > MAX_FISIERE) {
+    return NextResponse.json(
+      { error: `Poți atașa maximum ${MAX_FISIERE} fișiere.` },
+      { status: 422 }
+    );
+  }
+  const totalBytes = fisiere.reduce((s, f) => s + f.size, 0);
+  if (totalBytes > MAX_TOTAL_BYTES) {
+    return NextResponse.json(
+      { error: "Suma fișierelor depășește 50 MB. Elimină unele documente." },
+      { status: 422 }
+    );
+  }
+  for (const fisier of fisiere) {
+    if (fisier.size > MAX_FISIER_BYTES) {
+      return NextResponse.json(
+        { error: `Fișierul „${fisier.name}" depășește 10 MB.` },
+        { status: 422 }
+      );
+    }
+    if (!MIME_PERMISE.has(fisier.type)) {
+      return NextResponse.json(
+        { error: `Fișierul „${fisier.name}" are un tip neacceptat. Acceptăm JPG, PNG, WEBP, PDF, DOC, DOCX.` },
+        { status: 422 }
+      );
+    }
+  }
 
   const service = createServiceClient();
 
