@@ -1,6 +1,6 @@
 # 010 — Admin: resetare parolă + clarificare flux cont nou
 
-**Status:** Draft
+**Status:** Implemented — de verificat manual (build OK)
 **Prioritate:** Medie
 **Effort:** M (~50 min)
 **Data:** 2026-05-28
