@@ -15,6 +15,10 @@ const schema = z.object({
   gdpr: z.string(),
 });
 
+// Versiunea textului de consimțământ GDPR din formularul public —
+// actualizeaz-o când se schimbă formularea afișată pacientului
+const GDPR_CONSENT_VERSION = "2026-06-v1";
+
 // Limite upload server-side (clientul are propriile limite, dar nu e de încredere)
 const MAX_FISIERE = 20;
 const MAX_FISIER_BYTES = 10 * 1024 * 1024; // 10 MB
@@ -128,6 +132,20 @@ export async function POST(request: Request) {
   }
 
   const cazId = caz.id;
+
+  // ─── 2b. Persistare consimțământ GDPR (art. 7 — demonstrabil) ───────────────
+  // Best-effort: update separat ca să nu blocheze crearea cazului dacă
+  // migrarea 004 (coloanele gdpr_*) nu e încă aplicată pe DB.
+  const { error: gdprError } = await service
+    .from("cases")
+    .update({
+      gdpr_consent_at: new Date().toISOString(),
+      gdpr_consent_version: GDPR_CONSENT_VERSION,
+    } as never)
+    .eq("id", cazId) as { error: unknown };
+  if (gdprError) {
+    console.error("Persistare consimțământ GDPR eșuată (migrarea 004 aplicată?):", gdprError);
+  }
 
   // ─── 3. Upload fișiere în Supabase Storage ──────────────────────────────────
   const CATEGORII_VALIDE = ["ct", "rmn", "ecografie", "radiografie", "biopsie", "analize", "scrisoare", "altele"];
