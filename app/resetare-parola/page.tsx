@@ -24,10 +24,15 @@ export default function ResetareParolaPage() {
     });
 
     if (error) {
-      setStare("eroare");
-      setEroare(`A apărut o eroare: ${error.message}`);
       console.error("Eroare resetPasswordForEmail:", error);
-      return;
+      // Excepție vizibilă doar pentru rate limit — utilizatorul trebuie să știe să aștepte
+      if (error.status === 429 || error.message.toLowerCase().includes("rate limit")) {
+        setStare("eroare");
+        setEroare("Prea multe cereri. Așteaptă câteva minute și încearcă din nou.");
+        return;
+      }
+      // Anti-enumerare: nu dezvăluim dacă emailul există sau nu —
+      // afișăm același mesaj de succes indiferent de rezultat
     }
 
     setStare("trimis");

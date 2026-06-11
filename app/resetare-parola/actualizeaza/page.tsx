@@ -4,6 +4,24 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import HeaderBrand from "@/components/layout/HeaderBrand";
+import PasswordInput from "@/components/ui/PasswordInput";
+
+// Aceleași reguli ca registerSchema / crearea de cont: min 8, o majusculă, o cifră
+const PAROLA_REGEX = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+type Putere = "slab" | "mediu" | "puternic";
+
+function calculeazaPutere(p: string): Putere {
+  if (!PAROLA_REGEX.test(p)) return "slab";
+  if (p.length >= 12) return "puternic";
+  return "mediu";
+}
+
+const CONFIG_PUTERE: Record<Putere, { bare: number; culoare: string; eticheta: string }> = {
+  slab: { bare: 1, culoare: "bg-red-400", eticheta: "Slabă" },
+  mediu: { bare: 2, culoare: "bg-amber-400", eticheta: "Medie" },
+  puternic: { bare: 3, culoare: "bg-green-500", eticheta: "Puternică" },
+};
 
 export default function ActualizeazaParolaPage() {
   const router = useRouter();
@@ -13,7 +31,8 @@ export default function ActualizeazaParolaPage() {
   const [eroare, setEroare] = useState("");
 
   const parolaNepotrivita = confirmare.length > 0 && parola !== confirmare;
-  const parolaScurta = parola.length > 0 && parola.length < 8;
+  const parolaInvalida = parola.length > 0 && !PAROLA_REGEX.test(parola);
+  const putere = calculeazaPutere(parola);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -21,8 +40,8 @@ export default function ActualizeazaParolaPage() {
       setEroare("Parolele nu se potrivesc.");
       return;
     }
-    if (parola.length < 8) {
-      setEroare("Parola trebuie să aibă cel puțin 8 caractere.");
+    if (!PAROLA_REGEX.test(parola)) {
+      setEroare("Parola trebuie să aibă minimum 8 caractere, o literă mare și o cifră.");
       return;
     }
 
@@ -87,23 +106,45 @@ export default function ActualizeazaParolaPage() {
               <label htmlFor="parola" className="block text-sm font-medium text-slate-700 mb-1.5">
                 Parolă nouă
               </label>
-              <input
+              <PasswordInput
                 id="parola"
-                type="password"
                 autoComplete="new-password"
                 required
                 value={parola}
                 onChange={(e) => setParola(e.target.value)}
-                placeholder="Minimum 8 caractere"
+                placeholder="Minimum 8 caractere, o majusculă, o cifră"
                 disabled={stare === "loading"}
                 className={`w-full px-4 py-2.5 rounded-lg border text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 transition-colors disabled:opacity-60 ${
-                  parolaScurta
+                  parolaInvalida
                     ? "border-red-300 focus:ring-red-300"
                     : "border-slate-300 focus:ring-rose-300 focus:border-rose-400"
                 }`}
               />
-              {parolaScurta && (
-                <p className="mt-1 text-xs text-red-600">Cel puțin 8 caractere.</p>
+              {parolaInvalida && (
+                <p className="mt-1 text-xs text-red-600">
+                  Minimum 8 caractere, cel puțin o literă mare și o cifră.
+                </p>
+              )}
+
+              {/* Indicator putere parolă */}
+              {parola.length > 0 && (
+                <div className="mt-2">
+                  <div className="flex gap-1.5">
+                    {[1, 2, 3].map((bara) => (
+                      <div
+                        key={bara}
+                        className={`h-1.5 flex-1 rounded-full transition-colors ${
+                          bara <= CONFIG_PUTERE[putere].bare
+                            ? CONFIG_PUTERE[putere].culoare
+                            : "bg-slate-200"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Putere: <span className="font-medium">{CONFIG_PUTERE[putere].eticheta}</span>
+                  </p>
+                </div>
               )}
             </div>
 
@@ -111,9 +152,8 @@ export default function ActualizeazaParolaPage() {
               <label htmlFor="confirmare" className="block text-sm font-medium text-slate-700 mb-1.5">
                 Confirmă parola
               </label>
-              <input
+              <PasswordInput
                 id="confirmare"
-                type="password"
                 autoComplete="new-password"
                 required
                 value={confirmare}
@@ -139,7 +179,7 @@ export default function ActualizeazaParolaPage() {
 
             <button
               type="submit"
-              disabled={stare === "loading" || !parola || !confirmare || parolaNepotrivita || parolaScurta}
+              disabled={stare === "loading" || !parola || !confirmare || parolaNepotrivita || !PAROLA_REGEX.test(parola)}
               className="w-full py-2.5 bg-rose-400 text-white rounded-lg font-semibold hover:bg-rose-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-rose-400 focus:ring-offset-2"
             >
               {stare === "loading" ? (

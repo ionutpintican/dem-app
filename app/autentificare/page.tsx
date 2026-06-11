@@ -1,21 +1,53 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import HeaderBrand from "@/components/layout/HeaderBrand";
+import PasswordInput from "@/components/ui/PasswordInput";
+
+function mapeazaEroare(err: { message?: string; status?: number }): {
+  mesaj: string;
+  rateLimit: boolean;
+} {
+  const msg = err.message?.toLowerCase() ?? "";
+  if (err.status === 429 || msg.includes("rate limit")) {
+    return {
+      mesaj: "Prea multe încercări. Așteaptă 60 de secunde înainte de a încerca din nou.",
+      rateLimit: true,
+    };
+  }
+  if (msg.includes("email not confirmed")) {
+    return {
+      mesaj: "Adresa de email nu a fost încă confirmată. Contactează administratorul.",
+      rateLimit: false,
+    };
+  }
+  return {
+    mesaj: "Email sau parolă incorectă. Verifică datele și încearcă din nou.",
+    rateLimit: false,
+  };
+}
 
 function FormAutentificare() {
   const [email, setEmail] = useState("");
   const [parola, setParola] = useState("");
   const [eroare, setEroare] = useState("");
   const [loading, setLoading] = useState(false);
+  const [secundeBlocat, setSecundeBlocat] = useState(0);
   const router = useRouter();
   const searchParams = useSearchParams();
   const parolaResetata = searchParams.get("resetat") === "1";
   const linkExpirat = searchParams.get("eroare") === "link-expirat";
   const contDezactivat = searchParams.get("eroare") === "cont-dezactivat";
+
+  // Countdown după rate limit — butonul rămâne dezactivat
+  useEffect(() => {
+    if (secundeBlocat <= 0) return;
+    const t = setTimeout(() => setSecundeBlocat((s) => s - 1), 1000);
+    return () => clearTimeout(t);
+  }, [secundeBlocat]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -29,7 +61,10 @@ function FormAutentificare() {
     });
 
     if (error) {
-      setEroare("Email sau parolă incorectă. Verifică datele și încearcă din nou.");
+      console.error("Eroare autentificare:", error);
+      const { mesaj, rateLimit } = mapeazaEroare(error);
+      setEroare(mesaj);
+      if (rateLimit) setSecundeBlocat(60);
       setLoading(false);
       return;
     }
@@ -102,10 +137,9 @@ function FormAutentificare() {
                 Ai uitat parola?
               </Link>
             </div>
-            <input
+            <PasswordInput
               id="parola"
               name="password"
-              type="password"
               autoComplete="current-password"
               required
               value={parola}
@@ -118,12 +152,17 @@ function FormAutentificare() {
           {eroare && (
             <div role="alert" className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
               {eroare}
+              {secundeBlocat > 0 && (
+                <span className="block mt-1 font-medium">
+                  Poți reîncerca în {secundeBlocat}s.
+                </span>
+              )}
             </div>
           )}
 
           <button
             type="submit"
-            disabled={loading || !email || !parola}
+            disabled={loading || !email || !parola || secundeBlocat > 0}
             className="w-full py-2.5 bg-rose-400 text-white rounded-lg font-semibold hover:bg-rose-500 active:bg-rose-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2"
           >
             {loading ? (
