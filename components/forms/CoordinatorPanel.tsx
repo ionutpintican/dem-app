@@ -117,9 +117,15 @@ export default function CoordinatorPanel({
         method: "POST",
       });
 
+      const data = await resp.json();
       if (!resp.ok) {
-        const data = await resp.json();
         throw new Error(data.error ?? "Eroare necunoscută");
+      }
+      // Succes doar dacă API-ul confirmă explicit trimiterea emailului
+      if (data.sent !== true) {
+        throw new Error(
+          "Statusul a fost actualizat, dar trimiterea emailului nu a putut fi confirmată. Contactează administratorul."
+        );
       }
 
       setStareTriimitere("trimis");

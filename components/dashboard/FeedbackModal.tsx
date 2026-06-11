@@ -169,12 +169,13 @@ export default function FeedbackModal({ numeUtilizator, rolUtilizator }: Props) 
                       onChange={(e) => setMesaj(e.target.value)}
                       required
                       rows={12}
+                      maxLength={5000}
                       placeholder="Descrie ce funcționează bine, ce ar putea fi îmbunătățit, sau orice idee nouă pentru aplicație..."
                       className="flex-1 w-full px-4 py-3 rounded-xl border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-300 text-sm resize-none leading-relaxed"
                       disabled={stare === "loading"}
                     />
-                    <p className="mt-1.5 text-xs text-slate-400 text-right">
-                      {mesaj.length} caractere
+                    <p className={`mt-1.5 text-xs text-right ${mesaj.length > 4500 ? "text-amber-600" : "text-slate-400"}`}>
+                      {mesaj.length} / 5000 caractere
                     </p>
                   </div>
 

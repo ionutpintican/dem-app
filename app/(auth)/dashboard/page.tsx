@@ -93,12 +93,10 @@ export default async function DashboardPage() {
           </div>
 
           <div className="flex items-center gap-3">
-            {!esteAdmin && (
-              <FeedbackModal
-                numeUtilizator={profil?.full_name ?? user.email ?? ""}
-                rolUtilizator={etichetaRol}
-              />
-            )}
+            <FeedbackModal
+              numeUtilizator={profil?.full_name ?? user.email ?? ""}
+              rolUtilizator={etichetaRol}
+            />
             <Link
               href="/profil"
               className="flex items-center gap-2.5 px-3 py-2 rounded-lg border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-colors"

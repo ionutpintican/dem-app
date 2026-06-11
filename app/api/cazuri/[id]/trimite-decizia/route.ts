@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { sendEmail } from "@/lib/email/resend";
 import { ETICHETA_ROL } from "@/lib/roluri";
+import { renderEmailTemplate, escapeHtml, FOOTER_GDPR } from "@/lib/email/template";
 
 export async function POST(
   _request: NextRequest,
@@ -120,6 +121,8 @@ export async function POST(
           day: "numeric", month: "long", year: "numeric",
         }),
       }),
+      kind: "decizie",
+      caseId: caz.id,
     });
   } catch (emailError) {
     console.error("Eroare trimitere email decizie:", emailError);
@@ -152,7 +155,8 @@ export async function POST(
     } as never);
   } catch { /* ignorăm */ }
 
-  return NextResponse.json({ success: true }, { status: 200 });
+  // sent: true = emailul a plecat efectiv către Resend ȘI statusul e actualizat
+  return NextResponse.json({ success: true, sent: true }, { status: 200 });
 }
 
 // ─── Template email decizie finală ───────────────────────────────────────────
@@ -190,31 +194,7 @@ function emailDecizieFinala({
     .map((i) => randSpecialist(i.role_at_time, i.content.concluzie ?? ""))
     .join("");
 
-  return `
-<!DOCTYPE html>
-<html lang="ro">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body style="margin:0;padding:0;background:#f8fafc;font-family:Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;padding:40px 16px;">
-    <tr><td align="center">
-      <table width="100%" cellpadding="0" cellspacing="0"
-        style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #e2e8f0;">
-
-        <!-- Header -->
-        <tr>
-          <td style="background:#f43f5e;padding:32px;text-align:center;">
-            <div style="display:inline-block;background:rgba(255,255,255,0.18);border-radius:12px;padding:10px 24px;margin-bottom:12px;">
-              <span style="color:#ffffff;font-size:18px;font-weight:700;letter-spacing:0.5px;">Decizia Oncologică</span>
-            </div>
-            <p style="color:#fce7f3;margin:0;font-size:12px;letter-spacing:1px;line-height:1.6;">
-              DECIZIA ECHIPEI MULTIDISCIPLINARE
-            </p>
-          </td>
-        </tr>
-
+  const continut = `
         <!-- Intro -->
         <tr>
           <td style="padding:32px 32px 0;">
@@ -289,31 +269,12 @@ function emailDecizieFinala({
               <tbody>${tablaSpecialisti}</tbody>
             </table>
           </td>
-        </tr>` : ""}
+        </tr>` : ""}`;
 
-        <!-- Footer -->
-        <tr>
-          <td style="padding:20px 32px;background:#f8fafc;border-top:1px solid #e2e8f0;text-align:center;">
-            <p style="margin:0;color:#94a3b8;font-size:11px;line-height:1.8;">
-              Acest document a fost generat automat de platforma Decizia Oncologică.<br>
-              Datele dumneavoastră sunt protejate conform
-              <strong>Regulamentului UE 679/2016 (GDPR)</strong>.<br>
-              Vă rugăm să nu răspundeți la acest mesaj.
-            </p>
-          </td>
-        </tr>
-
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
-}
-
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+  return renderEmailTemplate({
+    subtitluHeader: "DECIZIA ECHIPEI MULTIDISCIPLINARE",
+    continut,
+    footerHtml: FOOTER_GDPR,
+    latimeMax: 600,
+  });
 }
