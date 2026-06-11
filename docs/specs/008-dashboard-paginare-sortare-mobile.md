@@ -1,6 +1,6 @@
 # 008 — Dashboard medic: paginare, sortare și layout responsive
 
-**Status:** Draft
+**Status:** Implemented — de verificat manual (build OK)
 **Prioritate:** Medie
 **Effort:** M (~50 min)
 **Data:** 2026-05-28
