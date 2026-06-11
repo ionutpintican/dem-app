@@ -1,6 +1,6 @@
 # 011 — Emailuri & feedback: robustețe, retry și template comun
 
-**Status:** Draft
+**Status:** Implemented — de verificat manual (build OK; migrarea 003 trebuie rulata manual in SQL Editor)
 **Prioritate:** Medie
 **Effort:** M (~60 min)
 **Data:** 2026-05-28
