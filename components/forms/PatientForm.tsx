@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
 
@@ -15,11 +15,19 @@ const CATEGORII_FISIER = [
   { value: "altele",      label: "Altele" },
 ];
 
+const MIN_BIRTH_DATE = "1900-01-01";
+
 const patientSchema = z.object({
   nume: z.string().min(2, "Numele trebuie să aibă cel puțin 2 caractere"),
   prenume: z.string().min(2, "Prenumele trebuie să aibă cel puțin 2 caractere"),
   email: z.string().email("Adresă de email invalidă"),
-  dataNasterii: z.string().min(1, "Data nașterii este obligatorie"),
+  dataNasterii: z
+    .string()
+    .min(1, "Data nașterii este obligatorie")
+    .refine((v) => {
+      const d = new Date(v);
+      return !Number.isNaN(d.getTime()) && d >= new Date(MIN_BIRTH_DATE) && d <= new Date();
+    }, "Data nașterii trebuie să fie între 1900 și astăzi"),
   telefon: z.string().optional(),
   descriere: z.string().min(20, "Descrierea trebuie să aibă cel puțin 20 de caractere"),
   gdpr: z.literal(true, "Trebuie să îți exprimi consimțământul pentru prelucrarea datelor"),
@@ -29,6 +37,8 @@ type PatientFormData = z.infer<typeof patientSchema>;
 type FieldErrors = Partial<Record<keyof PatientFormData, string>>;
 
 const MAX_FILE_SIZE_MB = 10;
+const MAX_TOTAL_SIZE_MB = 50;
+const STORAGE_KEY = "dem-patient-draft-v1";
 const ACCEPTED_TYPES = [
   "image/jpeg", "image/png", "image/webp",
   "application/pdf",
@@ -61,10 +71,37 @@ export default function PatientForm() {
   const [fileCategories, setFileCategories] = useState<Record<string, string>>({});
   const [errors, setErrors] = useState<FieldErrors>({});
   const [fileError, setFileError] = useState<string>("");
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [eroareServer, setEroareServer] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
+
+  // ─── Auto-save draft în localStorage (fără gdpr și fără fișiere) ────────────
+  // Restore la mount
+  useEffect(() => {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    try {
+      const draft = JSON.parse(raw) as Partial<typeof fields>;
+      setFields((prev) => ({ ...prev, ...draft, gdpr: false }));
+    } catch { /* draft corupt — ignorăm */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Save cu debounce 500ms
+  useEffect(() => {
+    const t = setTimeout(() => {
+      // gdpr nu se persistă — consimțământul se reconfirmă la fiecare cerere
+      const { nume, prenume, email, dataNasterii, telefon, descriere } = fields;
+      try {
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({ nume, prenume, email, dataNasterii, telefon, descriere })
+        );
+      } catch { /* storage plin / blocat — ignorăm */ }
+    }, 500);
+    return () => clearTimeout(t);
+  }, [fields]);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     const { name, value, type } = e.target;
@@ -87,6 +124,16 @@ export default function PatientForm() {
       setFileError(`Fiecare fișier trebuie să fie sub ${MAX_FILE_SIZE_MB} MB.`);
       return;
     }
+
+    // Limită totală pe cerere — aceeași ca pe server
+    const numeExistente = new Set(files.map((f) => f.name));
+    const deAdaugat = selected.filter((f) => !numeExistente.has(f.name));
+    const totalDupa = [...files, ...deAdaugat].reduce((s, f) => s + f.size, 0);
+    if (totalDupa > MAX_TOTAL_SIZE_MB * 1024 * 1024) {
+      setFileError(`Suma fișierelor depășește ${MAX_TOTAL_SIZE_MB} MB. Elimină unele documente.`);
+      return;
+    }
+
     setFiles((prev) => {
       const names = new Set(prev.map((f) => f.name));
       return [...prev, ...selected.filter((f) => !names.has(f.name))];
@@ -150,33 +197,12 @@ export default function PatientForm() {
         setStatus("error");
         return;
       }
+      // Succes — curățăm draftul local înainte de navigarea la /confirmare
+      localStorage.removeItem(STORAGE_KEY);
       router.push(`/confirmare${data.cazId ? `?id=${data.cazId}` : ""}`);
     } catch {
       setStatus("error");
     }
-  }
-
-  if (status === "success") {
-    return (
-      <div className="text-center py-16 px-4">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-rose-100 mb-6">
-          <svg aria-hidden="true" className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-          </svg>
-        </div>
-        <h2 className="text-2xl font-bold text-slate-900 mb-2">Cerere trimisă cu succes!</h2>
-        <p className="text-slate-600 max-w-md mx-auto">
-          Am înregistrat cererea ta. Vei primi un email de confirmare în cel mai scurt timp.
-          Un specialist îți va contacta în termen de 24–48 de ore.
-        </p>
-        <button
-          onClick={() => { setStatus("idle"); setFields({ nume: "", prenume: "", email: "", dataNasterii: "", telefon: "", descriere: "", gdpr: false }); setFiles([]); }}
-          className="mt-8 px-6 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2"
-        >
-          Trimite o altă cerere
-        </button>
-      </div>
-    );
   }
 
   return (
@@ -263,6 +289,7 @@ export default function PatientForm() {
             autoComplete="bday"
             value={fields.dataNasterii}
             onChange={handleChange}
+            min={MIN_BIRTH_DATE}
             max={new Date().toISOString().split("T")[0]}
             className={`w-full px-4 py-2.5 rounded-lg border text-slate-900 focus:outline-none focus-visible:ring-2 transition-colors ${
               errors.dataNasterii
@@ -392,7 +419,7 @@ export default function PatientForm() {
 
         {files.length > 0 && (
           <ul className="mt-3 space-y-2">
-            {files.map((f) => (
+            {files.map((f, idx) => (
               <li key={f.name} className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
                 <div className="flex items-center justify-between">
                   <span className="flex items-center gap-2 text-sm text-slate-700 truncate">
@@ -425,11 +452,38 @@ export default function PatientForm() {
                       <option key={cat.value} value={cat.value}>{cat.label}</option>
                     ))}
                   </select>
+                  {idx === 0 && files.length >= 2 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const categoria = fileCategories[f.name] ?? "altele";
+                        setFileCategories(() => {
+                          const toate: Record<string, string> = {};
+                          files.forEach((fis) => { toate[fis.name] = categoria; });
+                          return toate;
+                        });
+                      }}
+                      className="text-xs text-rose-400 hover:text-rose-500 font-medium shrink-0 px-2 py-1 rounded hover:bg-rose-50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-300"
+                    >
+                      Aplică la toate
+                    </button>
+                  )}
                 </div>
               </li>
             ))}
           </ul>
         )}
+
+        {/* Contor spațiu total */}
+        {files.length > 0 && (() => {
+          const totalBytes = files.reduce((s, f) => s + f.size, 0);
+          const procent = totalBytes / (MAX_TOTAL_SIZE_MB * 1024 * 1024);
+          return (
+            <p className={`mt-2 text-xs text-right ${procent > 0.8 ? "text-red-500" : "text-slate-400"}`}>
+              {formatBytes(totalBytes)} / {MAX_TOTAL_SIZE_MB} MB folosit
+            </p>
+          );
+        })()}
       </div>
 
       {/* GDPR */}
@@ -485,6 +539,9 @@ export default function PatientForm() {
 
       <p className="text-center text-xs text-slate-400">
         Câmpurile marcate cu <span className="text-red-500">*</span> sunt obligatorii.
+      </p>
+      <p className="text-center text-xs text-slate-300">
+        Datele tale sunt salvate automat în acest browser.
       </p>
     </form>
   );
