@@ -16,7 +16,32 @@ async function verificaAdmin() {
   return user;
 }
 
-// PATCH /api/admin/users/[id] — actualizare cont
+// GET /api/admin/users/[id] — statistici cont (pentru modalul de ștergere)
+export async function GET(
+  _request: Request,
+  { params }: { params: { id: string } }
+) {
+  const admin = await verificaAdmin();
+  if (!admin) {
+    return NextResponse.json({ error: "Acces interzis" }, { status: 403 });
+  }
+
+  const service = createServiceClient();
+  const { data: inputuri } = await service
+    .from("specialist_inputs")
+    .select("case_id")
+    .eq("user_id", params.id) as unknown as {
+      data: { case_id: string }[] | null;
+      error: unknown;
+    };
+
+  const evaluari = (inputuri ?? []).length;
+  const cazuri = new Set((inputuri ?? []).map((i) => i.case_id)).size;
+
+  return NextResponse.json({ evaluari, cazuri });
+}
+
+// PATCH /api/admin/users/[id] — actualizare cont / resetare parolă
 export async function PATCH(
   request: Request,
   { params }: { params: { id: string } }
@@ -29,6 +54,71 @@ export async function PATCH(
   const { id } = params;
   const body = await request.json();
   const service = createServiceClient();
+
+  // ─── Resetare parolă: parolă temporară nouă setată de admin ────────────────
+  if (body.reset_password !== undefined) {
+    const parola = body.reset_password;
+    if (
+      typeof parola !== "string" ||
+      parola.length < 8 ||
+      !/[A-Z]/.test(parola) ||
+      !/[0-9]/.test(parola)
+    ) {
+      return NextResponse.json(
+        { error: "Parola trebuie să aibă minimum 8 caractere, o literă mare și o cifră." },
+        { status: 422 }
+      );
+    }
+    const { error } = await service.auth.admin.updateUserById(id, { password: parola });
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+    return NextResponse.json({ success: true });
+  }
+
+  // ─── Resetare parolă: trimite email cu link de reset ───────────────────────
+  if (body.send_reset_email === true) {
+    const { data: tinta } = await service
+      .from("users")
+      .select("email")
+      .eq("id", id)
+      .single() as unknown as { data: { email: string } | null; error: unknown };
+
+    if (!tinta) {
+      return NextResponse.json({ error: "Utilizatorul nu există." }, { status: 404 });
+    }
+
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? new URL(request.url).origin;
+    const { error } = await service.auth.resetPasswordForEmail(tinta.email, {
+      redirectTo: `${baseUrl}/auth/callback?next=/resetare-parola/actualizeaza`,
+    });
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+    return NextResponse.json({ success: true });
+  }
+
+  // ─── Sincronizare email cu auth.users (altfel login-ul rămâne pe emailul vechi) ─
+  if (body.email !== undefined) {
+    const { data: profilCurent } = await service
+      .from("users")
+      .select("email")
+      .eq("id", id)
+      .single() as unknown as { data: { email: string } | null; error: unknown };
+
+    if (profilCurent && body.email !== profilCurent.email) {
+      const { error: authError } = await service.auth.admin.updateUserById(id, {
+        email: body.email,
+        email_confirm: true,
+      });
+      if (authError) {
+        const mesaj = authError.message.includes("already")
+          ? "Există deja un cont cu această adresă de email."
+          : authError.message;
+        return NextResponse.json({ error: mesaj }, { status: 409 });
+      }
+    }
+  }
 
   // Regulă de business: nu poți dezactiva singurul Coordonator activ
   if (body.is_active === false) {

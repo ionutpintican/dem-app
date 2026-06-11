@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useState, useTransition } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ROLURI_MEDICALE, ETICHETA_ROL, CULORI_ROL } from "@/lib/roluri";
 import type { Utilizator } from "@/app/api/admin/users/route";
@@ -134,7 +134,8 @@ function ModalContNou({
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
         <h2 className="text-xl font-bold text-slate-900 mb-1">Cont nou</h2>
         <p className="text-sm text-slate-500 mb-6">
-          Completează datele — doctorul va primi credențialele pe email.
+          Completează datele. <strong className="text-slate-700">Notează parola</strong> — o vei
+          transmite separat doctorului (nu se trimite automat pe email).
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4" noValidate>
@@ -363,6 +364,188 @@ function ModalEditareCont({
   );
 }
 
+// ─── Modal resetare parolă ────────────────────────────────────────────────────
+function ModalResetParola({
+  utilizator,
+  onClose,
+}: {
+  utilizator: Utilizator;
+  onClose: () => void;
+}) {
+  const [optiune, setOptiune] = useState<"parola_noua" | "email">("parola_noua");
+  const [parolaTemporara, setParolaTemporara] = useState(genereazaParola());
+  const [parolaCopiata, setParolaCopiata] = useState(false);
+  const [stare, setStare] = useState<"idle" | "succes">("idle");
+  const [eroare, setEroare] = useState("");
+  const [pending, startTransition] = useTransition();
+
+  function copiazaParola() {
+    navigator.clipboard.writeText(parolaTemporara);
+    setParolaCopiata(true);
+    setTimeout(() => setParolaCopiata(false), 2000);
+  }
+
+  function handleSubmit() {
+    setEroare("");
+    startTransition(async () => {
+      const body =
+        optiune === "parola_noua"
+          ? { reset_password: parolaTemporara }
+          : { send_reset_email: true };
+      const res = await fetch(`/api/admin/users/${utilizator.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setEroare(data.error ?? "Eroare la resetarea parolei.");
+        return;
+      }
+      setStare("succes");
+    });
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
+        <h2 className="text-xl font-bold text-slate-900 mb-1">Resetare parolă</h2>
+        <p className="text-sm text-slate-500 mb-6">{utilizator.full_name ?? utilizator.email}</p>
+
+        {stare === "succes" ? (
+          <div className="space-y-5">
+            <div className="rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700">
+              {optiune === "parola_noua"
+                ? "Parola a fost resetată. Transmite-o doctorului separat."
+                : `Email de resetare trimis la ${utilizator.email}.`}
+            </div>
+            {optiune === "parola_noua" && (
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  readOnly
+                  value={parolaTemporara}
+                  className="flex-1 px-4 py-2.5 rounded-lg border border-slate-300 bg-slate-50 text-slate-700 font-mono text-sm focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={copiazaParola}
+                  className="px-3 py-2.5 rounded-lg border border-slate-300 hover:bg-slate-100 transition-colors text-sm font-medium text-slate-600"
+                >
+                  {parolaCopiata ? "✓" : "Copiază"}
+                </button>
+              </div>
+            )}
+            <button
+              onClick={onClose}
+              className="w-full py-2.5 rounded-lg bg-slate-900 text-white font-semibold hover:bg-slate-700 transition-colors"
+            >
+              Închide
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {/* Opțiunea A — parolă temporară */}
+            <label className={`block rounded-xl border p-4 cursor-pointer transition-colors ${
+              optiune === "parola_noua" ? "border-rose-300 bg-rose-50" : "border-slate-200 hover:border-slate-300"
+            }`}>
+              <span className="flex items-start gap-3">
+                <input
+                  type="radio"
+                  name="optiune-reset"
+                  checked={optiune === "parola_noua"}
+                  onChange={() => setOptiune("parola_noua")}
+                  className="mt-1 h-4 w-4 text-rose-400 focus:ring-rose-300"
+                />
+                <span>
+                  <span className="block text-sm font-medium text-slate-900">Generează parolă temporară</span>
+                  <span className="block text-xs text-slate-500 mt-0.5">
+                    Setezi o parolă nouă acum și o transmiți tu doctorului.
+                  </span>
+                </span>
+              </span>
+              {optiune === "parola_noua" && (
+                <span className="mt-3 flex gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value={parolaTemporara}
+                    className="flex-1 px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-700 font-mono text-sm focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={copiazaParola}
+                    className="px-3 py-2 rounded-lg border border-slate-300 hover:bg-slate-100 transition-colors text-sm text-slate-600"
+                    title="Copiază parola"
+                  >
+                    {parolaCopiata ? "✓" : "Copiază"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setParolaTemporara(genereazaParola())}
+                    className="px-3 py-2 rounded-lg border border-slate-300 hover:bg-slate-100 transition-colors text-sm text-slate-600"
+                    title="Generează altă parolă"
+                  >
+                    ↻
+                  </button>
+                </span>
+              )}
+            </label>
+
+            {/* Opțiunea B — email de resetare */}
+            <label className={`block rounded-xl border p-4 cursor-pointer transition-colors ${
+              optiune === "email" ? "border-rose-300 bg-rose-50" : "border-slate-200 hover:border-slate-300"
+            }`}>
+              <span className="flex items-start gap-3">
+                <input
+                  type="radio"
+                  name="optiune-reset"
+                  checked={optiune === "email"}
+                  onChange={() => setOptiune("email")}
+                  className="mt-1 h-4 w-4 text-rose-400 focus:ring-rose-300"
+                />
+                <span>
+                  <span className="block text-sm font-medium text-slate-900">Trimite email de resetare</span>
+                  <span className="block text-xs text-slate-500 mt-0.5">
+                    Doctorul primește un link la {utilizator.email} și își alege singur parola.
+                  </span>
+                </span>
+              </span>
+            </label>
+
+            {eroare && (
+              <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+                {eroare}
+              </div>
+            )}
+
+            <div className="flex gap-3 pt-1">
+              <button
+                type="button"
+                onClick={onClose}
+                disabled={pending}
+                className="flex-1 py-2.5 rounded-lg border border-slate-300 text-slate-700 font-medium hover:bg-slate-50 transition-colors disabled:opacity-50"
+              >
+                Anulează
+              </button>
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={pending}
+                className="flex-1 py-2.5 rounded-lg bg-rose-400 text-white font-semibold hover:bg-rose-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {pending
+                  ? "Se procesează..."
+                  : optiune === "parola_noua" ? "Resetează parola" : "Trimite emailul"}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── Modal confirmare ștergere cont ──────────────────────────────────────────
 function ModalStergeCont({
   utilizator,
@@ -374,7 +557,23 @@ function ModalStergeCont({
   onSuccess: () => void;
 }) {
   const [eroare, setEroare] = useState("");
+  const [confirmEmail, setConfirmEmail] = useState("");
+  const [statistici, setStatistici] = useState<{ evaluari: number; cazuri: number } | null>(null);
   const [pending, startTransition] = useTransition();
+
+  const matchExact = confirmEmail === utilizator.email;
+
+  // Contor evaluări — adminul vede impactul înainte de a confirma
+  useEffect(() => {
+    let anulat = false;
+    fetch(`/api/admin/users/${utilizator.id}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!anulat && data) setStatistici(data);
+      })
+      .catch(() => { /* statisticile sunt informative — nu blocăm modalul */ });
+    return () => { anulat = true; };
+  }, [utilizator.id]);
 
   function handleSterge() {
     setEroare("");
@@ -411,7 +610,35 @@ function ModalStergeCont({
           Doctorul nu va mai putea accesa aplicația. Contribuțiile medicale și concluziile sale din cazurile existente
           vor rămâne în sistem.
         </p>
-        <p className="text-xs text-slate-400 mb-6">Această acțiune nu poate fi anulată.</p>
+
+        {statistici && (
+          <div className="rounded-lg bg-slate-50 border border-slate-200 px-4 py-3 text-sm text-slate-600 mb-3">
+            Doctorul are <strong className="text-slate-900">{statistici.evaluari}{" "}
+            {statistici.evaluari === 1 ? "evaluare" : "evaluări"}</strong> în{" "}
+            <strong className="text-slate-900">{statistici.cazuri}{" "}
+            {statistici.cazuri === 1 ? "caz" : "cazuri"}</strong>. Acestea vor rămâne
+            marcate cu rolul de la momentul evaluării.
+          </div>
+        )}
+
+        <p className="text-xs text-slate-400 mb-4">Această acțiune nu poate fi anulată.</p>
+
+        {/* Confirmare prin tastarea emailului — previne click-ul accidental */}
+        <div className="mb-4">
+          <label htmlFor="confirm-email" className="block text-xs font-medium text-slate-600 mb-1.5">
+            Tastează <span className="font-mono text-slate-900">{utilizator.email}</span> pentru a confirma
+          </label>
+          <input
+            id="confirm-email"
+            type="text"
+            value={confirmEmail}
+            onChange={(e) => setConfirmEmail(e.target.value)}
+            placeholder="Tastează emailul pentru a confirma"
+            autoComplete="off"
+            spellCheck={false}
+            className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-red-300 transition-colors"
+          />
+        </div>
 
         {eroare && (
           <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 mb-4">
@@ -431,7 +658,7 @@ function ModalStergeCont({
           <button
             type="button"
             onClick={handleSterge}
-            disabled={pending}
+            disabled={pending || !matchExact}
             className="flex-1 py-2.5 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {pending ? "Se șterge..." : "Șterge contul"}
@@ -453,6 +680,7 @@ export default function AdminPanel({
   const [afiseazaModalNou, setAfiseazaModalNou] = useState(false);
   const [utilizatorDeEditat, setUtilizatorDeEditat] = useState<Utilizator | null>(null);
   const [utilizatorDesters, setUtilizatorDesters] = useState<Utilizator | null>(null);
+  const [utilizatorResetParola, setUtilizatorResetParola] = useState<Utilizator | null>(null);
   const [eroareToggle, setEroareToggle] = useState<string>("");
   const [cautare, setCautare] = useState("");
   const [filtruRol, setFiltruRol] = useState("");
@@ -535,6 +763,12 @@ export default function AdminPanel({
           utilizator={utilizatorDesters}
           onClose={() => setUtilizatorDesters(null)}
           onSuccess={() => laContSters(utilizatorDesters.id)}
+        />
+      )}
+      {utilizatorResetParola && (
+        <ModalResetParola
+          utilizator={utilizatorResetParola}
+          onClose={() => setUtilizatorResetParola(null)}
         />
       )}
 
@@ -658,6 +892,17 @@ export default function AdminPanel({
                           className="text-xs font-medium text-slate-600 hover:text-rose-400 transition-colors px-3 py-1.5 rounded-lg hover:bg-rose-50"
                         >
                           Editează
+                        </button>
+                        <button
+                          onClick={() => setUtilizatorResetParola(u)}
+                          className="p-1.5 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+                          title="Resetează parola"
+                          aria-label={`Resetează parola pentru ${u.full_name ?? u.email}`}
+                        >
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                              d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                          </svg>
                         </button>
                         {u.role !== "admin" && (
                           <button
