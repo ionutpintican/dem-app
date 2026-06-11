@@ -9,6 +9,11 @@ export const ROLURI_OBLIGATORII = [
 
 export const TOTAL_OBLIGATORII = ROLURI_OBLIGATORII.length; // 6
 
+export const PAGE_SIZE = 25; // cazuri pe pagină în dashboard
+
+// Ordinea de prioritate pentru sortarea „După status" (cazurile noi primele)
+export const PRIORITATE_STATUS = ["nou", "in_lucru", "gata_expediere", "trimis", "arhivat"];
+
 export const STATUS_CONFIG: Record<
   string,
   { eticheta: string; culoare: string; punct: string }

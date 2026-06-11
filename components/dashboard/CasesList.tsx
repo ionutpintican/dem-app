@@ -1,9 +1,9 @@
 ﻿"use client";
 
-import { useState } from "react";
+import { useState, useDeferredValue } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { STATUS_CONFIG, TOTAL_OBLIGATORII } from "@/lib/constante";
+import { STATUS_CONFIG, TOTAL_OBLIGATORII, PRIORITATE_STATUS } from "@/lib/constante";
 
 const LUNI = ["ian.", "feb.", "mar.", "apr.", "mai", "iun.", "iul.", "aug.", "sep.", "oct.", "nov.", "dec."];
 
@@ -22,7 +22,16 @@ export type CazPreview = {
   status: string;
   created_at: string;
   completati: number;
+  are_evaluarea_mea: boolean;
 };
+
+const OPTIUNI_SORTARE = [
+  { valoare: "recent", eticheta: "Cele mai recente" },
+  { valoare: "vechi", eticheta: "Cele mai vechi" },
+  { valoare: "status", eticheta: "După status" },
+  { valoare: "progres", eticheta: "După progres" },
+  { valoare: "alfa", eticheta: "Alfabetic A-Z" },
+];
 
 function BadgeStatus({ status }: { status: string }) {
   const cfg = STATUS_CONFIG[status] ?? STATUS_CONFIG.nou;
@@ -131,25 +140,43 @@ function ModalConfirmareSterge({
 export default function CasesList({
   cazuri,
   esteAdmin = false,
+  sort = "recent",
 }: {
   cazuri: CazPreview[];
   esteAdmin?: boolean;
+  sort?: string;
 }) {
   const router = useRouter();
   const [cautare, setCautare] = useState("");
+  // Filtrarea folosește valoarea amânată — la tastare rapidă, .filter() nu
+  // rulează la fiecare keystroke (React o procesează cu prioritate redusă)
+  const cautareAmanata = useDeferredValue(cautare);
   const [filtruStatus, setFiltruStatus] = useState("");
+  const [doarFaraEvaluareaMea, setDoarFaraEvaluareaMea] = useState(false);
   const [cazDeSters, setCazDeSters] = useState<CazPreview | null>(null);
   const [loadingSterge, setLoadingSterge] = useState(false);
   const [eroareSterge, setEroareSterge] = useState<string | null>(null);
 
   const cazuriFiltrate = cazuri.filter((c) => {
     const potrivitCautare =
-      !cautare ||
-      c.patient_name.toLowerCase().includes(cautare.toLowerCase()) ||
-      c.patient_email.toLowerCase().includes(cautare.toLowerCase());
+      !cautareAmanata ||
+      c.patient_name.toLowerCase().includes(cautareAmanata.toLowerCase()) ||
+      c.patient_email.toLowerCase().includes(cautareAmanata.toLowerCase());
     const potrivitStatus = !filtruStatus || c.status === filtruStatus;
-    return potrivitCautare && potrivitStatus;
+    const potrivitEvaluare = !doarFaraEvaluareaMea || !c.are_evaluarea_mea;
+    return potrivitCautare && potrivitStatus && potrivitEvaluare;
   });
+
+  // Sortările pe status/progres se aplică client-side pe pagina curentă;
+  // recent/vechi/alfa vin deja ordonate din query-ul server-side
+  const cazuriOrdonate = [...cazuriFiltrate];
+  if (sort === "status") {
+    cazuriOrdonate.sort(
+      (a, b) => PRIORITATE_STATUS.indexOf(a.status) - PRIORITATE_STATUS.indexOf(b.status)
+    );
+  } else if (sort === "progres") {
+    cazuriOrdonate.sort((a, b) => b.completati - a.completati);
+  }
 
   async function handleSterge() {
     if (!cazDeSters) return;
@@ -204,6 +231,7 @@ export default function CasesList({
         <select
           value={filtruStatus}
           onChange={(e) => setFiltruStatus(e.target.value)}
+          aria-label="Filtrează după status"
           className="px-4 py-2.5 rounded-lg border border-slate-300 text-slate-700 focus:outline-none focus:ring-2 focus:ring-rose-300 text-sm bg-white"
         >
           <option value="">Toate statusurile</option>
@@ -211,82 +239,149 @@ export default function CasesList({
             <option key={val} value={val}>{cfg.eticheta}</option>
           ))}
         </select>
+        <select
+          value={sort}
+          onChange={(e) => router.push(`/dashboard?page=1&sort=${e.target.value}`)}
+          aria-label="Sortează cazurile"
+          className="px-4 py-2.5 rounded-lg border border-slate-300 text-slate-700 focus:outline-none focus:ring-2 focus:ring-rose-300 text-sm bg-white"
+        >
+          {OPTIUNI_SORTARE.map((o) => (
+            <option key={o.valoare} value={o.valoare}>{o.eticheta}</option>
+          ))}
+        </select>
       </div>
+
+      {/* Filtru rapid — doar pentru medici (adminul nu evaluează) */}
+      {!esteAdmin && (
+        <label className="flex items-center gap-2 mb-4 cursor-pointer w-fit">
+          <input
+            type="checkbox"
+            checked={doarFaraEvaluareaMea}
+            onChange={(e) => setDoarFaraEvaluareaMea(e.target.checked)}
+            className="h-4 w-4 rounded border-slate-300 text-rose-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-300"
+          />
+          <span className="text-sm text-slate-600">Doar cazurile fără evaluarea mea</span>
+        </label>
+      )}
 
       {/* Lista */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        {cazuriFiltrate.length === 0 ? (
-          <div className="text-center py-16 text-slate-400">
-            <svg className="mx-auto mb-3 w-10 h-10 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <p className="text-sm">
-              {cautare || filtruStatus
-                ? "Niciun caz găsit pentru filtrele aplicate."
-                : "Nu există cazuri înregistrate încă."}
-            </p>
+      {cazuriOrdonate.length === 0 ? (
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 text-center py-16 text-slate-400">
+          <svg className="mx-auto mb-3 w-10 h-10 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <p className="text-sm">
+            {cautare || filtruStatus || doarFaraEvaluareaMea
+              ? "Niciun caz găsit pentru filtrele aplicate."
+              : "Nu există cazuri înregistrate încă."}
+          </p>
+        </div>
+      ) : (
+        <>
+          {/* Card view — mobil (<640px) */}
+          <div className="sm:hidden space-y-2">
+            {cazuriOrdonate.map((caz) => (
+              <div key={caz.id} className="bg-white border border-slate-200 rounded-xl shadow-sm p-4">
+                <div className="flex justify-between items-start mb-2">
+                  <div className="min-w-0">
+                    <p className="font-medium text-slate-900 truncate">{caz.patient_name}</p>
+                    <p className="text-xs text-slate-400 truncate">{caz.patient_email}</p>
+                  </div>
+                  <span className="text-xs text-slate-400 shrink-0 ml-3">
+                    {formatData(caz.created_at)}
+                  </span>
+                </div>
+                <BadgeStatus status={caz.status} />
+                <div className="mt-3">
+                  <BaraProgres completati={caz.completati} />
+                </div>
+                <div className="mt-3 flex items-center justify-between">
+                  {esteAdmin ? (
+                    <button
+                      onClick={() => setCazDeSters(caz)}
+                      className="text-xs font-medium text-red-500 hover:text-red-700 px-2 py-1.5 rounded-lg hover:bg-red-50 transition-colors"
+                      aria-label={`Șterge cazul ${caz.patient_name}`}
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  ) : <span />}
+                  <Link
+                    href={`/caz/${caz.id}`}
+                    className="text-xs font-medium text-rose-400 hover:text-rose-500 px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors"
+                  >
+                    Deschide →
+                  </Link>
+                </div>
+              </div>
+            ))}
           </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-slate-50 border-b border-slate-200">
-                <tr>
-                  <th className="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wide">Pacient</th>
-                  <th className="text-left px-4 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wide">Data</th>
-                  <th className="text-left px-4 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wide">Status</th>
-                  <th className="text-left px-4 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wide">Progres</th>
-                  <th className="px-4 py-3.5" />
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {cazuriFiltrate.map((caz) => (
-                  <tr key={caz.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-5 py-4">
-                      <p className="font-medium text-slate-900">{caz.patient_name}</p>
-                      <p className="text-xs text-slate-400 mt-0.5">{caz.patient_email}</p>
-                    </td>
-                    <td className="px-4 py-4 text-slate-500 whitespace-nowrap">
-                      {formatData(caz.created_at)}
-                    </td>
-                    <td className="px-4 py-4">
-                      <BadgeStatus status={caz.status} />
-                    </td>
-                    <td className="px-4 py-4">
-                      <BaraProgres completati={caz.completati} />
-                    </td>
-                    <td className="px-4 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Link
-                          href={`/caz/${caz.id}`}
-                          className="text-xs font-medium text-rose-400 hover:text-rose-500 px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors"
-                        >
-                          Deschide →
-                        </Link>
-                        {esteAdmin && (
-                          <button
-                            onClick={() => setCazDeSters(caz)}
-                            className="text-xs font-medium text-red-500 hover:text-red-700 px-2 py-1.5 rounded-lg hover:bg-red-50 transition-colors"
-                            title="Șterge caz"
-                          >
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
-                        )}
-                      </div>
-                    </td>
+
+          {/* Tabel — desktop (≥640px) */}
+          <div className="hidden sm:block bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-slate-50 border-b border-slate-200">
+                  <tr>
+                    <th className="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wide">Pacient</th>
+                    <th className="text-left px-4 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wide">Data</th>
+                    <th className="text-left px-4 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wide">Status</th>
+                    <th className="text-left px-4 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wide">Progres</th>
+                    <th className="px-4 py-3.5" />
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {cazuriOrdonate.map((caz) => (
+                    <tr key={caz.id} className="hover:bg-slate-50 transition-colors">
+                      <td className="px-5 py-4">
+                        <p className="font-medium text-slate-900">{caz.patient_name}</p>
+                        <p className="text-xs text-slate-400 mt-0.5">{caz.patient_email}</p>
+                      </td>
+                      <td className="px-4 py-4 text-slate-500 whitespace-nowrap">
+                        {formatData(caz.created_at)}
+                      </td>
+                      <td className="px-4 py-4">
+                        <BadgeStatus status={caz.status} />
+                      </td>
+                      <td className="px-4 py-4">
+                        <BaraProgres completati={caz.completati} />
+                      </td>
+                      <td className="px-4 py-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Link
+                            href={`/caz/${caz.id}`}
+                            className="text-xs font-medium text-rose-400 hover:text-rose-500 px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors"
+                          >
+                            Deschide →
+                          </Link>
+                          {esteAdmin && (
+                            <button
+                              onClick={() => setCazDeSters(caz)}
+                              className="text-xs font-medium text-red-500 hover:text-red-700 px-2 py-1.5 rounded-lg hover:bg-red-50 transition-colors"
+                              title="Șterge caz"
+                            >
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        )}
-      </div>
+        </>
+      )}
 
       <p className="mt-2 text-xs text-slate-400 text-right">
-        {cazuriFiltrate.length} din {cazuri.length} cazuri
+        {cazuriOrdonate.length} din {cazuri.length} cazuri pe pagină
       </p>
     </div>
   );

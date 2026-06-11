@@ -6,13 +6,25 @@ import Link from "next/link";
 import CasesList, { type CazPreview } from "@/components/dashboard/CasesList";
 import FeedbackModal from "@/components/dashboard/FeedbackModal";
 import { ETICHETA_ROL } from "@/lib/roluri";
-import { ROLURI_OBLIGATORII } from "@/lib/constante";
+import { ROLURI_OBLIGATORII, PAGE_SIZE } from "@/lib/constante";
 import HeaderBrand from "@/components/layout/HeaderBrand";
 
-export default async function DashboardPage() {
+const SORTARI_VALIDE = ["recent", "vechi", "alfa", "status", "progres"] as const;
+export type Sortare = (typeof SORTARI_VALIDE)[number];
+
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: { page?: string; sort?: string };
+}) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/autentificare");
+
+  const page = Math.max(1, parseInt(searchParams.page ?? "1", 10) || 1);
+  const sort: Sortare = (SORTARI_VALIDE as readonly string[]).includes(searchParams.sort ?? "")
+    ? (searchParams.sort as Sortare)
+    : "recent";
 
   // Profil utilizator
   const { data: profil } = await supabase
@@ -28,24 +40,45 @@ export default async function DashboardPage() {
   const esteCoordinator = profil?.is_coordinator ?? false;
   const etichetaRol = ETICHETA_ROL[profil?.role ?? ""] ?? profil?.role ?? "—";
 
-  // Cazuri cu inputurile specialiștilor (pentru progres)
+  // Sortările pe coloane DB se fac în query; status/progres se sortează
+  // client-side pe pagina curentă (în CasesList)
+  const orderConfig =
+    sort === "vechi"
+      ? { column: "created_at", ascending: true }
+      : sort === "alfa"
+        ? { column: "patient_name", ascending: true }
+        : { column: "created_at", ascending: false };
+
+  // Cazuri paginate (25/pagină) + count total, cu inputurile specialiștilor
   const service = createServiceClient();
-  const { data: cazuriRaw } = await service
+  const { data: cazuriRaw, count } = await service
     .from("cases")
-    .select("id, patient_name, patient_email, status, created_at, specialist_inputs(role_at_time)")
-    .order("created_at", { ascending: false }) as unknown as {
+    .select(
+      "id, patient_name, patient_email, status, created_at, specialist_inputs(role_at_time, user_id, is_coordinator_conclusion)",
+      { count: "exact" }
+    )
+    .order(orderConfig.column, { ascending: orderConfig.ascending })
+    .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1) as unknown as {
       data: {
         id: string;
         patient_name: string;
         patient_email: string;
         status: string;
         created_at: string;
-        specialist_inputs: { role_at_time: string }[];
+        specialist_inputs: {
+          role_at_time: string;
+          user_id: string;
+          is_coordinator_conclusion: boolean;
+        }[];
       }[] | null;
+      count: number | null;
       error: unknown;
     };
 
-  // Calculează progresul per caz
+  const totalCazuri = count ?? 0;
+  const totalPagini = Math.max(1, Math.ceil(totalCazuri / PAGE_SIZE));
+
+  // Calculează progresul per caz + dacă userul curent are deja evaluare
   const cazuri: CazPreview[] = (cazuriRaw ?? []).map((c) => {
     const roluriCompletate = new Set(
       c.specialist_inputs
@@ -59,14 +92,21 @@ export default async function DashboardPage() {
       status: c.status,
       created_at: c.created_at,
       completati: roluriCompletate.size,
+      are_evaluarea_mea: c.specialist_inputs.some(
+        (i) => i.user_id === user.id && !i.is_coordinator_conclusion
+      ),
     };
   });
 
-  // Statistici
-  const nrNou = cazuri.filter((c) => c.status === "nou").length;
-  const nrInLucru = cazuri.filter((c) => c.status === "in_lucru").length;
-  const nrFinalizate = cazuri.filter((c) =>
-    c.status === "gata_expediere" || c.status === "trimis"
+  // Statistici globale — query ușor (doar coloana status), nu tot payload-ul
+  const { data: statusuri } = await service
+    .from("cases")
+    .select("status") as unknown as { data: { status: string }[] | null; error: unknown };
+
+  const nrNou = (statusuri ?? []).filter((c) => c.status === "nou").length;
+  const nrInLucru = (statusuri ?? []).filter((c) => c.status === "in_lucru").length;
+  const nrFinalizate = (statusuri ?? []).filter(
+    (c) => c.status === "gata_expediere" || c.status === "trimis"
   ).length;
 
   return (
@@ -144,9 +184,9 @@ export default async function DashboardPage() {
             Bună ziua, {profil?.full_name?.split(" ")[0] ?? "doctor"}!
           </h1>
           <p className="text-slate-500 mt-1">
-            {cazuri.length === 0
+            {totalCazuri === 0
               ? "Nu există cazuri înregistrate încă."
-              : `${cazuri.length} ${cazuri.length === 1 ? "caz înregistrat" : "cazuri înregistrate"} în sistem.`}
+              : `${totalCazuri} ${totalCazuri === 1 ? "caz înregistrat" : "cazuri înregistrate"} în sistem.`}
           </p>
         </div>
 
@@ -165,7 +205,34 @@ export default async function DashboardPage() {
         </div>
 
         {/* Lista cazuri */}
-        <CasesList cazuri={cazuri} esteAdmin={esteAdmin} />
+        <CasesList cazuri={cazuri} esteAdmin={esteAdmin} sort={sort} />
+
+        {/* Paginare */}
+        {totalPagini > 1 && (
+          <nav className="mt-6 flex items-center justify-between text-sm" aria-label="Paginare">
+            <Link
+              href={`/dashboard?page=${page - 1}&sort=${sort}`}
+              aria-disabled={page <= 1}
+              tabIndex={page <= 1 ? -1 : undefined}
+              className={page <= 1
+                ? "text-slate-300 pointer-events-none"
+                : "text-rose-400 hover:text-rose-500 font-medium"}
+            >
+              ← Anterioară
+            </Link>
+            <span className="text-slate-500">Pagina {page} din {totalPagini}</span>
+            <Link
+              href={`/dashboard?page=${page + 1}&sort=${sort}`}
+              aria-disabled={page >= totalPagini}
+              tabIndex={page >= totalPagini ? -1 : undefined}
+              className={page >= totalPagini
+                ? "text-slate-300 pointer-events-none"
+                : "text-rose-400 hover:text-rose-500 font-medium"}
+            >
+              Următoarea →
+            </Link>
+          </nav>
+        )}
       </main>
     </div>
   );
