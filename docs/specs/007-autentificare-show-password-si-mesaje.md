@@ -1,6 +1,6 @@
 # 007 — Autentificare: vizibilitate parolă + mesaje contextuale și rate-limit
 
-**Status:** Draft
+**Status:** Implemented — de verificat manual (build OK)
 **Prioritate:** Medie
 **Effort:** S (~30 min)
 **Data:** 2026-05-28
