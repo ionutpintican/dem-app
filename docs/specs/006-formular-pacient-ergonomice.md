@@ -1,6 +1,6 @@
 # 006 — Formular pacient: îmbunătățiri ergonomice și de robustețe
 
-**Status:** Draft
+**Status:** Implemented — de verificat manual (build OK)
 **Prioritate:** Medie
 **Effort:** M (~40 min)
 **Data:** 2026-05-28
